@@ -7,40 +7,42 @@
       <div
         class="blue-bar"
         v-if="showTitleBar"
-        style="width: 3px; height: 16px; border-radius: 2px"
+        style="width: 3px; border-radius: 2px"
+        :style="{ height: fontSize }"
       ></div>
       <b :style="{ fontSize: fontSize }">{{ title }}</b>
     </div>
     <div class="flex justify-center items-center">
       <slot></slot>
     </div>
+     
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue'
 
 const props = defineProps({
   title: String,
   size: {
     type: String,
-    default: "small",
+    default: 'small',
   },
   showTitleBar: {
     type: Boolean,
     default: true,
   },
-});
+})
 const fontSize = computed(() => {
   switch (props.size) {
-    case "small":
-      return "14px";
-    case "big":
-      return "18px";
+    case 'small':
+      return '14px'
+    case 'big':
+      return '18px'
     default:
-      return props.size;
+      return props.size
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>

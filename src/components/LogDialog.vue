@@ -69,6 +69,7 @@ function copyLog() {
   writeToClipBoard(props.data).then(() => {
     try {
       $message.success("复制成功");
+      emit("success");
     } catch (err) {
       console.log("$message未定义");
       emit("success");
