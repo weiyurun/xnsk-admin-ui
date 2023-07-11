@@ -1,0 +1,508 @@
+<!--
+  form表单组件
+
+ <xnsk-form :config="formConfig" :defaultValue="defaultValue" />
+
+defaultValue [Object] 默认值 
+
+ config说明
+
+  labelWidth [Number]  文案宽度（px)
+  trigger [String] 校验触发方式
+  submitBtn [Ojbect] 提交按钮
+    {
+      label [String] 按钮文案
+      loading [Proxy(Boolean)] 按钮loading ，响应式Boolean
+      click [Function] 表单校验成功后的回调
+    }
+  columns [Array] 表单项
+    {
+      label [String] 文案
+      type [String] 类型（input,textarea,select,radio,checkBox）
+      propName [String] 属性名
+      required [Boolean] 是否必填
+      maxlength [Number] 最大长度
+      //defaultValue 默认值 
+      show [Function | Boolean] 是否显示
+      disabled [Function | Boolean] 是否禁用
+      readonly [Function | Boolean] 是否只读
+      rows [Number] textarea默认行数
+      selection [Array] select,radio,checkBox的备选项
+      validator 自定义校验规则
+    }
+
+  slot:
+    btns  自定义底部按钮
+
+-->
+<template>
+  <div>
+    <n-form
+      :model="formResult"
+      :rules="rules"
+      :ref="
+        (el) => {
+          formId = el;
+        }
+      "
+      label-placement="left"
+      :label-width="config.labelWidth || 'auto'"
+      require-mark-placement="right"
+    >
+      <n-grid x-gap="12" :cols="24">
+        <n-gi
+          v-for="item in getItems"
+          :class="{ 'is-slot': item.type === 'slot' && !item.useFormItem }"
+          :key="item.propName"
+          :span="item.span"
+          :offset="item.offset"
+        >
+          <n-form-item
+            :label="
+              item.type === 'slot' && !item.useFormItem ? null : item.label
+            "
+            :path="item.propName"
+          >
+            <!-- 单行输入框 -->
+            <n-input
+              v-trim
+              v-if="item.type === 'input'"
+              v-model:value="formResult[item.propName]"
+              :placeholder="getPlaceholder(item)"
+              :maxlength="item.maxlength || 20"
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+              @update:value="(e) => changePropName(e, item)"
+            />
+            <!-- 多行输入 -->
+            <n-input
+              v-trim
+              v-if="item.type === 'textarea'"
+              v-model:value="formResult[item.propName]"
+              type="textarea"
+              :placeholder="getPlaceholder(item)"
+              :maxlength="item.maxlength || 200"
+              :rows="item.rows || 9"
+              show-count
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+              @update:value="(e) => changePropName(e, item)"
+            />
+            <!-- 选择框 -->
+            <n-select
+              v-if="item.type === 'select'"
+              v-model:value="formResult[item.propName]"
+              :options="getSelection(item)"
+              :placeholder="getPlaceholder(item)"
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+              @update:value="(e) => changePropName(e, item)"
+            />
+            <!-- 单选框 -->
+            <n-radio-group
+              v-if="item.type === 'radio'"
+              v-model:value="formResult[item.propName]"
+              @update:value="(e) => changePropName(e, item)"
+              :name="item.propName"
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+            >
+              <n-space>
+                <n-radio
+                  v-for="selectionItem in getSelection(item)"
+                  :key="selectionItem.value"
+                  :value="selectionItem.value"
+                >
+                  {{ selectionItem.label }}
+                </n-radio>
+              </n-space>
+            </n-radio-group>
+            <!-- 复选框 -->
+            <n-checkbox-group
+              v-if="item.type === 'checkbox'"
+              v-model:value="formResult[item.propName]"
+            >
+              {{ formResult[item.propName] }}
+              <n-space item-style="display: flex;">
+                <n-checkbox
+                  v-for="item in getSelection(item)"
+                  :key="item.value"
+                  :value="item.value"
+                  :label="item.label"
+                />
+              </n-space>
+            </n-checkbox-group>
+            <!-- 提示文字 -->
+            <span v-if="item.type === 'text'" :style="item.style">
+              {{
+                item.text?.xnsk_admin_ui_realType === "function"
+                  ? item.text()
+                  : item.text
+              }}
+            </span>
+            <slot
+              v-if="item.type === 'slot'"
+              :name="item.propName"
+              :data="formResult"
+              :item="item"
+            ></slot>
+          </n-form-item>
+        </n-gi>
+      </n-grid>
+    </n-form>
+    <div v-if="!slot.btns" class="form-btns">
+      <n-button
+        v-if="config?.submitBtn"
+        class="btn"
+        type="primary"
+        :loading="submitLoading"
+        @click="submitClick"
+      >
+        {{ config?.submitBtn?.label || "确定" }}
+      </n-button>
+      <n-button v-if="config?.submitBtn" @click="cancelClick"> 取消 </n-button>
+    </div>
+    <slot v-if="slot.btns" name="btns"></slot>
+  </div>
+</template>
+
+<script setup>
+import {
+  NForm,
+  NFormItem,
+  NGrid,
+  NGi,
+  NCheckboxGroup,
+  NCheckbox,
+  NRadioGroup,
+  NRadio,
+  NButton,
+  NSelect,
+  NInput,
+} from "naive-ui";
+import {
+  computed,
+  onMounted,
+  ref,
+  unref,
+  useAttrs,
+  useSlots,
+  watchEffect,
+  watch,
+} from "vue";
+import { getRandomId } from "../../utils";
+
+const errMsgPrefix = {
+  input: "请输入",
+  textarea: "请输入",
+  select: "请选择",
+  radio: "请选择",
+  checkbox: "请选择",
+  slot: "缺少",
+};
+const formId = ref("from_" + getRandomId());
+
+const slot = useSlots();
+const emit = defineEmits(["submit", "cancel", "change"]);
+const attrs = useAttrs();
+const props = defineProps({
+  config: {
+    type: Object,
+    default: {},
+  },
+  defaultValue: {
+    type: Object,
+    default: {},
+  },
+});
+/* form结果 */
+const formResult = ref({});
+/* 校验 */
+const rules = ref({});
+/* loading */
+const submitLoading = computed(() => {
+  if (props.config?.submitBtn?.loading) {
+    return props.config.submitBtn.loading?.xnsk_admin_ui_realType === "function"
+      ? unref(props.config.submitBtn.loading())
+      : unref(props.config.submitBtn.loading);
+  } else {
+    return false;
+  }
+});
+/* 表单项 */
+const getItems = computed(() => {
+  let arr = [];
+  if (props.config?.columns?.length > 0) {
+    props.config.columns.forEach((item) => {
+      let obj = {};
+      obj.label = item.label;
+      obj.type = item.type;
+      obj.useFormItem = item.useFormItem || false;
+      obj.propName = item.propName;
+      obj.required = item.required;
+      obj.maxlength = item.maxlength;
+      obj.rows = item.rows || 9;
+      obj.validator = item.validator || null;
+      obj.trigger = item.trigger || props.config?.trigger || "blur";
+      obj.selection = item.selection || [];
+      obj.span = item.span || 24;
+      obj.offset = item.offset || 0;
+      obj.onInput = item.onInput || null;
+
+      obj.text = item.text || "";
+      obj.style = item.style || "";
+
+      /* 备选项 */
+      //注释掉，不能在这里写，如果备选项是异步获取并且网速极慢，会在填写表单时重置表单，因为计算属性重新执行了
+      /* if (item.type === "select") {
+        obj.selection =
+          item.selection.xnsk_admin_ui_realType === "function"
+            ? unref(item.selection())
+            : unref(item.selection);
+      } */
+
+      /* 如果必填，加入校验 */
+      let ruleObject = {
+        required: obj?.required,
+        trigger: obj.trigger,
+        key: obj?.propName,
+        validator(rule, value) {
+          if (obj?.validator?.xnsk_admin_ui_realType === "function") {
+            //如果传函数
+            return obj?.validator(value);
+          } else if (obj?.validator?.xnsk_admin_ui_realType === undefined) {
+            //如果不传
+            if (obj?.required && [null, undefined, ""].includes(value)) {
+              //不传校验规则，但设置了必填，则只判断空值
+              return new Error(`${errMsgPrefix[obj.type]}${obj.label}`);
+            } else if (
+              value?.xnsk_admin_ui_realType === "array" &&
+              value.length === 0
+            ) {
+              //如果是数组，长度为0也报异常
+              return new Error(`${errMsgPrefix[obj.type]}${obj.label}`);
+            } else {
+              //不传校验规则，没有设置必填，或当前有值，则为true
+              return true;
+            }
+          }
+        },
+      };
+      rules.value[obj.propName] = ruleObject;
+
+      /* 是否禁用 */
+      if (item.disabled !== undefined) {
+        let isDisabled =
+          item.disabled?.xnsk_admin_ui_realType === "function"
+            ? item.disabled()
+            : item.disabled;
+        isDisabled && (obj.disabled = true);
+      }
+      /* 是否只读 */
+      if (item.readonly !== undefined) {
+        let isReadonly =
+          item.readonly?.xnsk_admin_ui_realType === "function"
+            ? item.readonly()
+            : item.readonly;
+        isReadonly && (obj.readonly = true);
+      }
+
+      /* 是否显示 */
+      let isShow =
+        item.show === undefined ||
+        (item.show?.xnsk_admin_ui_realType === "function"
+          ? item.show(formResult.value)
+          : item.show);
+      isShow && arr.push(obj);
+    });
+    return arr;
+  }
+});
+
+/* 初始化字段 */
+initForm();
+watchEffect(() => {
+  let keys = Object.keys(props.defaultValue);
+  keys.forEach((key) => {
+    let findItem = props.config?.columns.find((item) => item.propName === key);
+    findItem && (formResult.value[key] = getDefaultValue(findItem));
+  });
+});
+/* watch(
+  () => JSON.stringify(props.defaultValue),
+  () => {
+    let keys = Object.keys(props.defaultValue);
+    keys.forEach((key) => {
+      let findItem = props.config?.columns.find(
+        (item) => item.propName === key
+      );
+      findItem && (formResult.value[key] = getDefaultValue(findItem));
+    });
+  },
+  {
+    deep: true,
+  }
+); */
+function initForm() {
+  let items = props.config?.columns || [];
+  items.forEach((item) => {
+    switch (item.type) {
+      case "input":
+      case "textarea":
+        item.propName && (formResult.value[item.propName] = "");
+        break;
+      case "select":
+        item.propName && (formResult.value[item.propName] = null);
+        break;
+    }
+  });
+}
+/* 处理提示语 */
+function getPlaceholder(item) {
+  /* 如果未传入placeholder */
+  if (!item.placeholder) {
+    if (item.type === "select") {
+      return `请选择${item.label}`;
+    } else {
+      return `请输入${item.label}`;
+    }
+  } else {
+    return item.placeholder;
+  }
+}
+/* 处理备选项 */
+function getSelection(item) {
+  let res =
+    item.selection?.xnsk_admin_ui_realType === "function"
+      ? unref(item.selection())
+      : unref(item.selection);
+  if (res.xnsk_admin_ui_realType === "array") {
+    return res;
+  } else {
+    let keys = Object.keys(res);
+    return keys.map((key) => {
+      return {
+        label: res[key],
+        value: key,
+      };
+    });
+  }
+}
+/* 获取默认值 */
+function getDefaultValue(item) {
+  return (
+    props.defaultValue?.[item.propName] ?? (item.type === "select" ? null : "")
+  );
+}
+
+/* 点击取消 */
+function cancelClick() {
+  if (props?.config?.cancelBtn?.click) {
+    props.config.cancelBtn.click();
+  } else {
+    emit("cancel");
+  }
+}
+
+//监听change
+function changePropName(val, item) {
+  if (item?.onInput?.xnsk_admin_ui_realType === "function") {
+    let res = item?.onInput?.(val);
+    if (res !== undefined) {
+      formResult.value[item.propName] = res;
+    }
+  }
+  //通知更新，返回最终结果
+  if (props.config?.change) {
+    props.config?.change(unref(formResult.value), item, val);
+  } else {
+    emit("change", unref(formResult.value), item, val);
+  }
+  //通知更新，返回修改项
+}
+/* 点击提交 */
+function submitClick() {
+  formId.value?.validate((errors) => {
+    if (!errors) {
+      if (props.config?.submitBtn?.click) {
+        $dialog.warning({
+          title: "确定提交？",
+          content: "",
+          positiveText: "确定",
+          negativeText: "取消",
+          onPositiveClick: () => {
+            props.config?.submitBtn?.click(unref(formResult.value));
+          },
+          onNegativeClick: () => {},
+        });
+      } else {
+        $dialog.warning({
+          title: "确定提交？",
+          content: "",
+          positiveText: "确定",
+          negativeText: "取消",
+          onPositiveClick: () => {
+            emit("submit", unref(formResult.value));
+          },
+          onNegativeClick: () => {},
+        });
+      }
+    } else {
+      /* 不通过 */
+    }
+  });
+}
+/* 外部使用，校验方法 */
+function validate(fn, key) {
+  if (key?.xnsk_admin_ui_realType === undefined) {
+    formId.value?.validate((errors) => fn && fn(errors));
+  } else {
+    let keys = key.xnsk_admin_ui_realType === "string" ? [key] : key;
+    formId.value?.validate(
+      (errors) => {
+        fn && fn(errors);
+      },
+      (rule) => {
+        return keys.includes(rule?.key);
+      },
+    );
+  }
+}
+/* 外部使用，获取表单数据*/
+function getValue() {
+  return formResult.value;
+}
+/* 外部使用，手动改变组件内部值 */
+function setValue(val = {}) {
+  let keys = Object.keys(val);
+  keys.forEach((key) => {
+    formResult.value[key] = val[key];
+  });
+}
+defineExpose({
+  validate,
+  getValue,
+  setValue,
+});
+</script>
+
+<style lang="scss" scoped>
+.form-btns {
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  bottom: -20px;
+  background-color: #fff;
+  z-index: 100;
+  padding: 20px;
+  .btn {
+    margin: 0 30px;
+  }
+}
+
+.is-slot {
+  :deep(.n-form-item-feedback-wrapper) {
+    display: none;
+  }
+}
+</style>

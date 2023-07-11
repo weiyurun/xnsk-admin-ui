@@ -1,5 +1,13 @@
 /* 导出 */
-export { default as XnskDialog } from "./DefaultDialog.vue"
-export { default as XnskDialogMsg } from "./LogDialog.vue"
-export { default as XnskBlueTitle } from "./BlueTitle.vue"
-export { default as XnskDrawer } from "./drawer.vue"
+export { Dialog } from "./Dialog"
+export { DialogMsg } from "./DialogMsg"
+export { BlueTitle } from "./BlueTitle"
+export { Drawer } from './Drawer'
+export { ListPage } from './ListPage'
+export { Form } from './Form'
+export { FormBtns } from './FormBtns'
+export { Info } from './Info'
+export { MarkDown } from './MarkDown'
+export { LoginAgreement } from "./LoginAgreement"
+export { TreeSync } from "./TreeSync"
+export { UploadFileList } from "./UploadFileList"

@@ -1,0 +1,1 @@
+export { default as LoginAgreement } from "./index.vue"

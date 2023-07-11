@@ -1,0 +1,1 @@
+export { default as TreeSync } from "./index.vue"

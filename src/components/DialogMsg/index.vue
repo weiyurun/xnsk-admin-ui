@@ -1,12 +1,12 @@
 <!--
   案例：
-  <XnskLogDialog
+  <xn-dialog-msg
       v-model:show=""
       data="我是日志的内容"
     />
 -->
 <template>
-  <DefaultDialog
+  <Dialog
     :title="title"
     v-model:show="isShow"
     width="800"
@@ -21,20 +21,20 @@
           <template #icon>
             <img
               class="mt-px"
-              src="../assets/img/copy.png"
+              src="../../assets/img/copy.png"
               style="width: 16px; height: 16px"
             /> </template
           >复制日志
         </n-button>
       </div>
     </template>
-  </DefaultDialog>
+  </Dialog>
 </template>
 
 <script setup>
-import DefaultDialog from "./DefaultDialog.vue";
+import { Dialog } from "../index";
 import { computed, useSlots } from "vue";
-import { writeToClipBoard } from "../utils";
+import { writeToClipBoard } from "../../utils";
 import { NButton } from "naive-ui";
 const emit = defineEmits(["update:show"]);
 
