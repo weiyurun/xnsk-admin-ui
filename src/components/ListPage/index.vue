@@ -230,6 +230,7 @@ import {
   NGrid,
   NGi,
   useDialog,
+  NPagination,
 } from "naive-ui";
 import {
   computed,
@@ -313,7 +314,8 @@ function initParams() {
   if (searchItems.value.length) {
     searchItems.value.forEach((item) => {
       if (item.type === "input") {
-        params.value[item.propName] = item?.defaultValue?.xnsk_admin_ui_realValue || "";
+        params.value[item.propName] =
+          item?.defaultValue?.xnsk_admin_ui_realValue || "";
       } else if (item.type === "select") {
         params.value[item.propName] =
           item.defaultValue === "" || item.defaultValue === undefined
@@ -425,7 +427,7 @@ function initTableColumns() {
                           },
                           onNegativeClick: () => {},
                         });
-                      }else{
+                      } else {
                         item.click(row) || null;
                       }
                     },
@@ -506,7 +508,8 @@ function getTableData(newParams = {}, callback = null) {
     } else {
       dataList.value = props.config.data.xnsk_admin_ui_realValue;
     }
-    pagination.value.itemCount = props.config.data.xnsk_admin_ui_realValue.length;
+    pagination.value.itemCount =
+      props.config.data.xnsk_admin_ui_realValue.length;
     return;
   }
   if (!props.config.apiName) return;
