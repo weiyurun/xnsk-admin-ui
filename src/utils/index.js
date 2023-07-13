@@ -156,3 +156,17 @@ export function getFileNameByUrl (_url = "") {
 export function getSuffixName (_name = "", _mark = "") {
   return _mark + _name.slice(_name.lastIndexOf(".") + 1)
 }
+
+/**
+ * 根据className找到上级dom（反向querySelector）
+ * @param {Element} el 源dom
+ * @param {String} className 要查询的className
+ * @returns Element || undefined
+ */
+export function getParentNode (el, className = "") {
+  let find = el
+  while (find.parentNode.className.split(" ").indexOf(className) === -1 && find.parentNode.tagName !== "BODY") {
+    find = find.parentNode
+  }
+  return find.parentNode.className.split(" ").indexOf(className) === -1 ? undefined : find.parentNode
+}

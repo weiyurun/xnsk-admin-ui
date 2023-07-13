@@ -74,6 +74,30 @@ defaultValue [Object] 默认值
               :readonly="item.readonly"
               @update:value="(e) => changePropName(e, item)"
             />
+            <!-- 可输入，可选择 -->
+            <n-select
+              v-if="item.type === 'input-select'"
+              class="input-select-select"
+              :value="formResult[item.propName]"
+              :options="getSelection(item)"
+              :placeholder="getPlaceholder(item)"
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+              show-on-focus
+              filterable
+              tag
+              :ignore-composition="false"
+              @input="
+                (e) => {
+                  formResult[item.propName] = e.target.value;
+                }
+              "
+              @update:value="
+                (e) => {
+                  formResult[item.propName] = e;
+                }
+              "
+            />
             <!-- 多行输入 -->
             <n-input
               v-trim
@@ -179,6 +203,7 @@ import {
   NButton,
   NSelect,
   NInput,
+  NMention,
 } from "naive-ui";
 import {
   computed,
@@ -190,9 +215,10 @@ import {
   watchEffect,
   watch,
 } from "vue";
-import { getRandomId } from "../../utils";
+import { getRandomId, getParentNode } from "../../utils";
 
 const errMsgPrefix = {
+  "input-select": "请输入",
   input: "请输入",
   textarea: "请输入",
   select: "请选择",
