@@ -359,9 +359,15 @@ function initTableColumns() {
           : row[item.key];
       };
     }
+    // 外部默认都用width，此处转为minWidth，表示默认均分多余空间
+    item.minWidth = item.minWidth || item.width;
+    item.width = "auto";
     /* 操作栏统一固定右侧 */
     if (item.key === "actions") {
       obj.fixed = "right";
+      //右侧操作栏不参与均分空间，把宽度改回来
+      item.width = item.minWidth;
+      item.minWidth = 0;
       obj.render = (row) => {
         let btns = [];
         if (props?.config?.table?.actions?.length > 0) {
