@@ -586,7 +586,12 @@ function searchClick() {
 /* 重置查询条件 */
 async function searchReset() {
   for (let p in params.value) {
-    params.value[p] = null;
+    let findItem = searchItems.value.find((i) => i.propName === p);
+    if (findItem) {
+      if (!findItem?.readOnly?.realValue && !findItem?.hidden?.realValue) {
+        params.value[p] = findItem?.defaultValue?.realValue ?? null;
+      }
+    }
   }
   searchClick();
   emit("search");
