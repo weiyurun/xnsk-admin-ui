@@ -476,7 +476,6 @@ function initTableColumns() {
         );
       };
     }
-    console.log("{ ...obj, ...item }", { ...obj, ...item });
     return { ...obj, ...item };
   });
   /* 行是否可展开 */
@@ -660,7 +659,6 @@ onMounted(() => {
   tableWidth.value = tableColumns.value.reduce((a, b) => {
     return a + (b.minWidth || b.width || 0);
   }, 0);
-  console.log("[ tableWidth.value ] >", tableWidth.value);
 });
 watchEffect(() => {
   if (props.config?.data?.xnsk_admin_ui_realType === "asyncfunction") {
