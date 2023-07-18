@@ -360,8 +360,13 @@ function initTableColumns() {
       };
     }
     // 外部默认都用width，此处转为minWidth，表示默认均分多余空间
+    // if (item.type !== "selection") {
+    //   item.minWidth = item.minWidth || item.width;
+    //   item.width = "auto";
+    // }
     item.minWidth = item.minWidth || item.width;
-    item.width = "auto";
+    // item.width = "auto";
+
     /* 操作栏统一固定右侧 */
     if (item.key === "actions") {
       obj.fixed = "right";
@@ -471,6 +476,7 @@ function initTableColumns() {
         );
       };
     }
+    console.log("{ ...obj, ...item }", { ...obj, ...item });
     return { ...obj, ...item };
   });
   /* 行是否可展开 */
@@ -654,6 +660,7 @@ onMounted(() => {
   tableWidth.value = tableColumns.value.reduce((a, b) => {
     return a + (b.minWidth || b.width || 0);
   }, 0);
+  console.log("[ tableWidth.value ] >", tableWidth.value);
 });
 watchEffect(() => {
   if (props.config?.data?.xnsk_admin_ui_realType === "asyncfunction") {

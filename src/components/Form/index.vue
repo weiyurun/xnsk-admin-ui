@@ -146,7 +146,6 @@ defaultValue [Object] 默认值
               v-if="item.type === 'checkbox'"
               v-model:value="formResult[item.propName]"
             >
-              {{ formResult[item.propName] }}
               <n-space item-style="display: flex;">
                 <n-checkbox
                   v-for="item in getSelection(item)"
