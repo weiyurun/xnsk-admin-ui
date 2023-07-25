@@ -112,7 +112,7 @@ const localFileList = ref([]);
 watch(
   () => props.value,
   (newData) => {
-    if ([null, undefined].includes(newData)) {
+    if ([null, undefined, ""].includes(newData)) {
       localFileList.value.splice(0);
       return;
     }
