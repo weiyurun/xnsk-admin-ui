@@ -122,6 +122,18 @@ defaultValue [Object] 默认值
               :readonly="item.readonly"
               @update:value="(e) => changePropName(e, item)"
             />
+            <!-- 树形选择框 -->
+            <n-tree-select
+              v-if="item.type === 'treeSelect'"
+              v-model:value="formResult[item.propName]"
+              :options="getSelection(item)"
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+              :label-field="item.selectionLabelKey"
+              :key-field="item.selectionValueKey"
+              :children-field="item.selectionChildrenKey"
+              @update:value="(e) => changePropName(e, item)"
+            />
             <!-- 单选框 -->
             <n-radio-group
               v-if="item.type === 'radio'"
@@ -203,6 +215,7 @@ import {
   NSelect,
   NInput,
   NMention,
+  NTreeSelect,
 } from "naive-ui";
 import {
   computed,
@@ -273,6 +286,12 @@ const getItems = computed(() => {
       obj.span = item.span || 24;
       obj.offset = item.offset || 0;
       obj.onInput = item.onInput || null;
+
+      if (["treeSelect"].includes(obj.type)) {
+        obj.selectionLabelKey = item.selectionLabelKey || "label";
+        obj.selectionValueKey = item.selectionValueKey || "value";
+        obj.selectionChildrenKey = item.selectionChildrenKey || "children";
+      }
 
       obj.text = item.text || "";
       obj.style = item.style || "";
