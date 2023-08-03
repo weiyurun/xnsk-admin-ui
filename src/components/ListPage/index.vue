@@ -174,7 +174,14 @@
           :scroll-x="tableWidth"
           striped
           :loading="loading"
-          :row-key="(row) => row.did ?? row.id ?? row.randomId ?? ''"
+          :row-key="
+            (row) =>
+              (props.config.selectionKey && row?.[props.config.selectionKey]) ??
+              row.did ??
+              row.id ??
+              row.randomId ??
+              ''
+          "
           :pagination="
             props?.config?.data &&
             !props?.config?.unPagination && {

@@ -30,4 +30,8 @@ const props = defineProps({
 onMounted(() => {});
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.n-drawer-body-content-wrapper) {
+  padding-bottom: 0 !important;
+}
+</style>
