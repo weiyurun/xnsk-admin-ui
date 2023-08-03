@@ -15,7 +15,6 @@
     <div class="flex justify-center items-center">
       <slot></slot>
     </div>
-     
   </div>
 </template>
 

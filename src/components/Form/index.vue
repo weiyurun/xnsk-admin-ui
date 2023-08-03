@@ -72,6 +72,8 @@ defaultValue [Object] 默认值
               :maxlength="item.maxlength || 20"
               :disabled="item.disabled"
               :readonly="item.readonly"
+              clearable
+              @blur="(e) => inputBlur(formResult[item.propName], item)"
               @update:value="(e) => changePropName(e, item)"
             />
             <!-- 可输入，可选择 -->
@@ -83,8 +85,12 @@ defaultValue [Object] 默认值
               :placeholder="getPlaceholder(item)"
               :disabled="item.disabled"
               :readonly="item.readonly"
+              :label-field="item.selectionLabelKey"
+              :value-field="item.selectionValueKey"
+              :children-field="item.selectionChildrenKey"
               show-on-focus
               filterable
+              :clearable="item.clearable !== false"
               tag
               :ignore-composition="false"
               @input="
@@ -110,6 +116,7 @@ defaultValue [Object] 默认值
               show-count
               :disabled="item.disabled"
               :readonly="item.readonly"
+              clearable
               @update:value="(e) => changePropName(e, item)"
             />
             <!-- 选择框 -->
@@ -120,6 +127,10 @@ defaultValue [Object] 默认值
               :placeholder="getPlaceholder(item)"
               :disabled="item.disabled"
               :readonly="item.readonly"
+              :label-field="item.selectionLabelKey"
+              :value-field="item.selectionValueKey"
+              :children-field="item.selectionChildrenKey"
+              :clearable="item.clearable !== false"
               @update:value="(e) => changePropName(e, item)"
             />
             <!-- 树形选择框 -->
@@ -132,6 +143,7 @@ defaultValue [Object] 默认值
               :label-field="item.selectionLabelKey"
               :key-field="item.selectionValueKey"
               :children-field="item.selectionChildrenKey"
+              :clearable="item.clearable !== false"
               @update:value="(e) => changePropName(e, item)"
             />
             <!-- 单选框 -->
@@ -146,10 +158,10 @@ defaultValue [Object] 默认值
               <n-space>
                 <n-radio
                   v-for="selectionItem in getSelection(item)"
-                  :key="selectionItem.value"
-                  :value="selectionItem.value"
+                  :key="selectionItem[item.selectionValueKey]"
+                  :value="selectionItem[item.selectionValueKey]"
                 >
-                  {{ selectionItem.label }}
+                  {{ selectionItem[item.selectionLabelKey] }}
                 </n-radio>
               </n-space>
             </n-radio-group>
@@ -160,10 +172,10 @@ defaultValue [Object] 默认值
             >
               <n-space item-style="display: flex;">
                 <n-checkbox
-                  v-for="item in getSelection(item)"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label"
+                  v-for="selectionItem in getSelection(item)"
+                  :key="selectionItem[item.selectionValueKey]"
+                  :value="selectionItem[item.selectionValueKey]"
+                  :label="selectionItem[item.selectionLabelKey]"
                 />
               </n-space>
             </n-checkbox-group>
@@ -185,23 +197,28 @@ defaultValue [Object] 默认值
         </n-gi>
       </n-grid>
     </n-form>
-    <div v-if="!slot.btns" class="form-btns">
-      <n-button
-        v-if="config?.submitBtn"
-        class="btn"
-        type="primary"
-        :loading="submitLoading"
-        @click="submitClick"
-      >
-        {{ config?.submitBtn?.label || "确定" }}
-      </n-button>
-      <n-button v-if="config?.submitBtn" @click="cancelClick"> 取消 </n-button>
-    </div>
+    <template v-if="!slot.btns">
+      <form-btns>
+        <n-button
+          v-if="config?.submitBtn"
+          type="primary"
+          :loading="submitLoading"
+          @click="submitClick"
+          class="m"
+        >
+          {{ config?.submitBtn?.label || "确定" }}
+        </n-button>
+        <n-button v-if="config?.submitBtn" @click="cancelClick">
+          取消
+        </n-button>
+      </form-btns>
+    </template>
     <slot v-if="slot.btns" name="btns"></slot>
   </div>
 </template>
 
 <script setup>
+import { FormBtns } from "../FormBtns";
 import {
   NForm,
   NFormItem,
@@ -286,8 +303,15 @@ const getItems = computed(() => {
       obj.span = item.span || 24;
       obj.offset = item.offset || 0;
       obj.onInput = item.onInput || null;
+      obj.onBlur = item.onBlur || null;
+      obj.clearable = item.clearable;
 
-      if (["treeSelect"].includes(obj.type)) {
+      /* 处理树形选择 */
+      if (
+        ["treeSelect", "select", "radio", "checkbox", "input-select"].includes(
+          obj.type,
+        )
+      ) {
         obj.selectionLabelKey = item.selectionLabelKey || "label";
         obj.selectionValueKey = item.selectionValueKey || "value";
         obj.selectionChildrenKey = item.selectionChildrenKey || "children";
@@ -464,6 +488,16 @@ function changePropName(val, item) {
   }
   //通知更新，返回修改项
 }
+//监听blur
+function inputBlur(val, item) {
+  if (item?.onBlur?.xnsk_admin_ui_realType === "function") {
+    let res = item?.onBlur?.(val);
+    if (res !== undefined) {
+      formResult.value[item.propName] = res;
+    }
+  }
+}
+
 /* 点击提交 */
 function submitClick() {
   formId.value?.validate((errors) => {
@@ -539,14 +573,19 @@ defineExpose({
   background-color: #fff;
   z-index: 100;
   padding: 20px;
-  .btn {
-    margin: 0 30px;
-  }
+  // .btn {
+  //   margin: 0 30px;
+  // }
 }
 
 .is-slot {
   :deep(.n-form-item-feedback-wrapper) {
     display: none;
+  }
+}
+:deep(.n-form-item) {
+  .n-form-item-label {
+    line-height: inherit;
   }
 }
 </style>

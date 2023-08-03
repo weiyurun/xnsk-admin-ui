@@ -1,9 +1,9 @@
 <template>
   <div
-    class="form-btns flex justify-center sticky marB20 relative"
+    class="form-btns sticky marB20 relative"
     style="bottom: 0; padding: 20px; background-color: #fff; z-index: 103"
   >
-    <n-space :size="[40, 20]">
+    <n-space justify="center" :size="[40, 20]">
       <slot></slot>
     </n-space>
   </div>

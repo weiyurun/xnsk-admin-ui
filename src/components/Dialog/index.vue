@@ -67,7 +67,12 @@
     <template #footer>
       <slot v-if="slot.footBtn" name="footBtn"></slot>
       <div v-else class="dialog-templete-btns">
-        <n-button v-if="footBtns.length > 0" type="info" @click="submitClick">
+        <n-button
+          v-if="footBtns.length > 0"
+          type="info"
+          :loading="loading"
+          @click="submitClick"
+        >
           {{ footBtns[0] }}
         </n-button>
         <n-button
@@ -168,7 +173,7 @@ function cancelClick() {
 .dialog-templete-btns {
   text-align: center;
   .n-button {
-    margin: 10px 10px 0 10px;
+    margin: 10px 20px 0 20px;
   }
 }
 </style>
@@ -178,12 +183,13 @@ function cancelClick() {
   box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.11);
   max-height: 95vh;
   max-width: 95vw;
-  overflow: hidden;
+  // overflow: hidden;
   display: flex;
   flex-direction: column;
   .n-card__content {
     flex: 1;
     overflow: auto;
+    padding-bottom: 0;
   }
 }
 </style>

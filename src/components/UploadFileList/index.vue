@@ -16,7 +16,7 @@
       fileChange: 文件选择回调
 -->
 <template>
-  <div style="width: 100%">
+  <div style="width: 100%" :class="{ 'hidden-upload-trigger': !triggerShow }">
     <n-upload
       :ref="
         (el) => {
@@ -88,7 +88,7 @@ const props = defineProps({
   },
   url: {
     type: String,
-    default: "",
+    default: "/less/api/warehouse/rest/obs/upload_file",
   },
   params: {
     type: Object,
@@ -97,6 +97,10 @@ const props = defineProps({
   token: {
     type: String,
     default: "",
+  },
+  triggerShow: {
+    type: Boolean,
+    default: true,
   },
 });
 /* 定义事件 */
@@ -145,14 +149,16 @@ const customRequest = async ({ file, onFinish, onError }) => {
   keys.forEach((key) => {
     formData.append(key, props.params[key]);
   });
+  loading.value = true;
   let res = await http(props.url, {
     "Content-Type": "multipart/form-data;charset=UTF-8",
     token: props.token,
   })(formData);
+  loading.value = false;
   if (res?.status === 200) {
     const strId = getRandomKeys(10);
     file.url = res?.data?.url ?? "";
-    file.name = strId;
+    file.name = getFileNameByUrl(file.url);
     onFinish();
   } else {
     onError();
@@ -206,6 +212,11 @@ defineExpose({
   span:first-child {
     width: 80%;
     padding: 5px 0;
+  }
+}
+.hidden-upload-trigger {
+  :deep(.n-upload-trigger) {
+    display: none;
   }
 }
 </style>

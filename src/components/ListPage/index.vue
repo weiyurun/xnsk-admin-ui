@@ -81,7 +81,7 @@
       >
         <n-grid x-gap="12" cols="3 s:3 m:4 l:5 xl:6" responsive="screen">
           <template v-for="(item, index) in searchItems">
-            <n-gi v-if="!item.hidden" :key="item?.did || index">
+            <n-gi v-if="!item.hidden" :key="index">
               <!-- 输入框 -->
               <n-input
                 v-if="item.type === 'input'"
@@ -148,7 +148,7 @@
           >
             <n-button
               :type="item.type || 'primary'"
-              class="marL15"
+              class="marL20"
               v-if="getHeadBtnShow(item)"
               :key="index"
               :loading="getButtonLoading(item.loading)"
@@ -261,6 +261,10 @@ const props = defineProps({
     type: [Object, Function],
     default: () => {},
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 /* 搜索项 */
 const searchItems = computed(() => {
@@ -359,20 +363,16 @@ function initTableColumns() {
           : row[item.key];
       };
     }
-    // 外部默认都用width，此处转为minWidth，表示默认均分多余空间
-    // if (item.type !== "selection") {
-    //   item.minWidth = item.minWidth || item.width;
-    //   item.width = "auto";
-    // }
-    item.minWidth = item.minWidth || item.width;
-    // item.width = "auto";
+
+    /* 2023.8.2 更新，去除了以前的对于width和minWidth的处理，因为暂时没有完美方案，先用组件自带的方案处理 */
+    /* 理想中的方案：设置width表示此列固定宽，无需均分；minWidth表示此列最小值，有溢出空间则参与均分，
+    目前组件自带方案有问题，当有多列设置了minWidth，它们被强行均分了（不知道是故意还是bug） */
+    if (item.type !== "selection") {
+    }
 
     /* 操作栏统一固定右侧 */
     if (item.key === "actions") {
       obj.fixed = "right";
-      //右侧操作栏不参与均分空间，把宽度改回来
-      item.width = item.minWidth;
-      item.minWidth = 0;
       obj.render = (row) => {
         let btns = [];
         if (props?.config?.table?.actions?.length > 0) {
@@ -522,6 +522,9 @@ function getTableData(newParams = {}, callback = null) {
     pagination.value.itemCount =
       props.config.data.xnsk_admin_ui_realValue.length;
     return;
+  } else if (props?.config?.data?.xnsk_admin_ui_realType === "array") {
+    //当配置项里data为[]时，表格数据为[]。因为需要和组件内部获取数据区分开，所以加了判断，当外部传入数据或清空数据时，实时变化
+    dataList.value = [];
   }
   if (!props.config.apiName) return;
   loading.value = true;
@@ -644,11 +647,27 @@ function getButtonLoading(_value) {
 }
 
 /* 可勾选时，勾选更新 */
-function handleCheckedRowKeys(keys) {
+const checkedKeys = ref([]);
+const checkedRows = ref([]);
+function handleCheckedRowKeys(keys, rows) {
+  checkedKeys.value = keys;
+  checkedRows.value = rows;
   if (props.config?.onUpdateChecked?.xnsk_admin_ui_realType === "function") {
     props.config.onUpdateChecked(keys);
   } else {
     emit("onUpdateChecked", keys);
+  }
+}
+/* 手动获取勾选数据 */
+function getSelectValues(type = "value") {
+  /* type说明：
+      value：只返回唯一表示，did或id
+      row: 获取原数据对象
+   */
+  if (type === "value") {
+    return unref(checkedKeys.value);
+  } else if (type === "row") {
+    return unref(checkedRows.value);
   }
 }
 
@@ -669,9 +688,16 @@ watchEffect(() => {
     getTableData();
   }
 });
+watch(
+  () => props.loading,
+  () => {
+    loading.value = props.loading;
+  },
+);
 defineExpose({
   getTableData,
   refresh: getTableData,
+  getSelectValues,
   pageData,
   loading,
   params,
@@ -697,6 +723,9 @@ defineExpose({
 }
 :deep(.text-grey) {
   color: #999999;
+}
+:deep(.text-yellow) {
+  color: #f0a020;
 }
 :deep(.n-data-table__pagination) {
   position: sticky;
