@@ -3,6 +3,7 @@
     :close-on-esc="outClosable"
     :mask-closable="outClosable"
     :auto-focus="false"
+    :trap-focus="false"
     v-bind="attrs"
   >
     <n-drawer-content :title="title" closable>
