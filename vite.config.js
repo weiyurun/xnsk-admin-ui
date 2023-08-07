@@ -1,6 +1,6 @@
-import { defineConfig } from "vite"
-import vue from "@vitejs/plugin-vue"
-import path from "path"
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import path from "path";
 
 export default defineConfig({
   resolve: {
@@ -20,7 +20,15 @@ export default defineConfig({
     assetsDir: "assets",
     sourcemap: true,
     rollupOptions: {
-      external: ["vue", "vue-router", "naive-ui", "tailwindcss", "axios", "markdown-it", "houriprotocol"],
+      external: [
+        "vue",
+        "vue-router",
+        "naive-ui",
+        "tailwindcss",
+        "markdown-it",
+        "houriprotocol",
+        "axios",
+      ],
     },
   },
   server: {
@@ -39,10 +47,10 @@ export default defineConfig({
       template: {
         compilerOptions: {
           isCustomElement: (tag) => {
-            return tag.startsWith("xnsk-") || tag.startsWith("Xnsk")
+            return tag.startsWith("xnsk-") || tag.startsWith("Xnsk");
           },
         },
       },
     }),
   ],
-})
+});

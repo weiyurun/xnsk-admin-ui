@@ -244,7 +244,7 @@ import {
   watchEffect,
   watch,
 } from "vue";
-import { getRandomId, getParentNode } from "../../utils";
+import { getRandomId, getParentNode, diffProperty } from "../../utils";
 
 const errMsgPrefix = {
   "input-select": "请输入",
@@ -294,7 +294,7 @@ const getItems = computed(() => {
       obj.type = item.type;
       obj.useFormItem = item.useFormItem || false;
       obj.propName = item.propName;
-      obj.required = item.required;
+      obj.required = item.required || false;
       obj.maxlength = item.maxlength;
       obj.rows = item.rows || 9;
       obj.validator = item.validator || null;
@@ -336,21 +336,23 @@ const getItems = computed(() => {
         key: obj?.propName,
         validator(rule, value) {
           if (obj?.validator?.xnsk_admin_ui_realType === "function") {
-            //如果传函数
+            //如果传函数校验，直接取函数返回结果
             return obj?.validator(value);
           } else if (obj?.validator?.xnsk_admin_ui_realType === undefined) {
-            //如果不传
-            if (obj?.required && [null, undefined, ""].includes(value)) {
-              //不传校验规则，但设置了必填，则只判断空值
-              return new Error(`${errMsgPrefix[obj.type]}${obj.label}`);
-            } else if (
-              value?.xnsk_admin_ui_realType === "array" &&
-              value.length === 0
-            ) {
-              //如果是数组，长度为0也报异常
-              return new Error(`${errMsgPrefix[obj.type]}${obj.label}`);
+            //如果不传校验规则
+            if (obj?.required) {
+              //但设置了必填，如果是null，undefined，""，或者是空数组，返回异常
+              if (
+                [null, undefined, ""].includes(value) ||
+                (value?.xnsk_admin_ui_realType === "array" &&
+                  value?.length === 0)
+              ) {
+                return new Error(`${errMsgPrefix[obj.type]}${obj.label}`);
+              } else {
+                return true;
+              }
             } else {
-              //不传校验规则，没有设置必填，或当前有值，则为true
+              //不传校验规则，也没有设置必填，则为true
               return true;
             }
           }
@@ -389,28 +391,30 @@ const getItems = computed(() => {
 
 /* 初始化字段 */
 initForm();
-watchEffect(() => {
-  let keys = Object.keys(props.defaultValue);
-  keys.forEach((key) => {
-    let findItem = props.config?.columns.find((item) => item.propName === key);
-    findItem && (formResult.value[key] = getDefaultValue(findItem));
-  });
-});
-/* watch(
-  () => JSON.stringify(props.defaultValue),
-  () => {
-    let keys = Object.keys(props.defaultValue);
+// watchEffect(() => {
+//   let keys = Object.keys(props.defaultValue);
+//   keys.forEach((key) => {
+//     let findItem = props.config?.columns.find((item) => item.propName === key);
+//     findItem && (formResult.value[key] = getDefaultValue(findItem));
+//   });
+// });
+watch(
+  () => props.defaultValue,
+  (newVal, oldVal) => {
+    let diff = diffProperty(newVal, oldVal);
+    let keys = Object.keys(diff);
     keys.forEach((key) => {
       let findItem = props.config?.columns.find(
-        (item) => item.propName === key
+        (item) => item.propName === key,
       );
       findItem && (formResult.value[key] = getDefaultValue(findItem));
     });
   },
   {
     deep: true,
-  }
-); */
+    immediate: true,
+  },
+);
 function initForm() {
   let items = props.config?.columns || [];
   items.forEach((item) => {
