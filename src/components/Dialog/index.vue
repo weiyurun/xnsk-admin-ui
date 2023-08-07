@@ -95,7 +95,15 @@ export default defineComponent({
 </script>
 <script setup>
 import { useDialog, NModal, NButton } from "naive-ui";
-import { watch, ref, computed, reactive, useSlots, useAttrs } from "vue";
+import {
+  watch,
+  ref,
+  computed,
+  reactive,
+  useSlots,
+  useAttrs,
+  watchEffect,
+} from "vue";
 import { BlueTitle } from "../index";
 
 const emit = defineEmits(["update:show"]);
@@ -131,12 +139,17 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  callbacks: {
+    type: Array,
+    default: [],
+  },
   //是否锁定
   lock: {
     type: Boolean,
     defualt: false,
   },
 });
+const callback = props.callbacks?.length > 0 ? props.callbacks : props.callback;
 /* 是否显示弹窗 */
 let isShow = computed({
   get() {
@@ -151,20 +164,20 @@ let isShow = computed({
 
 /* 提交 */
 function submitClick() {
-  props.callback[0] && props.callback[0]();
+  callback[0] && callback[0]();
 }
 /* 取消 */
 function cancelClick() {
   if (attrs.onBeforeClose) {
     emit("beforeClose", () => {
-      if (props.callback[1]) {
+      if (callback[1]) {
         emit("update:show", false);
-        props.callback[1] && props.callback[1]();
+        callback[1] && callback[1]();
       }
     });
   } else {
     emit("update:show", false);
-    props.callback[1] && props.callback[1]();
+    callback[1] && callback[1]();
   }
 }
 </script>

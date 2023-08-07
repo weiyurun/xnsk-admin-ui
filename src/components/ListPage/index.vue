@@ -554,7 +554,7 @@ function getTableData(newParams = {}, callback = null) {
         }
         pageData.value = res || {};
         pagination.value.itemCount = res.total || res.data.total;
-        pagination.value.page = res.pageNum || res.data.pageNum;
+        pagination.value.page = res.pageNum || res.data.pageNum || 1;
         emit("success", pageData.value);
       } else {
         props?.config?.showErrMsg && $message.error(res.message);

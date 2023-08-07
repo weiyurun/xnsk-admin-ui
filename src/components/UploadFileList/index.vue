@@ -130,6 +130,7 @@ watch(
       if (!find_) {
         localFileList.value.push({
           url: url,
+          name: getFileNameByUrl(url),
           status: "finished",
         });
       }
