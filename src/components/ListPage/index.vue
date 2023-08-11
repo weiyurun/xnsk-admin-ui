@@ -370,6 +370,9 @@ function initTableColumns() {
           : row[item.key];
       };
     }
+    /* 2023.8.9 更新：宽度支持传入函数，以便动态更改（限首次渲染），场景：不同角色/业务展示的宽度不同，但不支持按表格数据动态更改 */
+    item.width = item.width?.xnsk_admin_ui_realValue;
+    item.minWidth = item.minWidth?.xnsk_admin_ui_realValue;
 
     /* 2023.8.2 更新，去除了以前的对于width和minWidth的处理，因为暂时没有完美方案，先用组件自带的方案处理 */
     /* 理想中的方案：设置width表示此列固定宽，无需均分；minWidth表示此列最小值，有溢出空间则参与均分，

@@ -131,6 +131,9 @@ defaultValue [Object] 默认值
               :value-field="item.selectionValueKey"
               :children-field="item.selectionChildrenKey"
               :clearable="item.clearable !== false"
+              :render-label="item.renderLabel"
+              :render-option="item.renderOption"
+              :render-tag="item.renderTag"
               @update:value="(e) => changePropName(e, item)"
             />
             <!-- 树形选择框 -->
@@ -306,6 +309,12 @@ const getItems = computed(() => {
       obj.onBlur = item.onBlur || null;
       obj.clearable = item.clearable;
 
+      /* 选择器的自定义渲染 */
+      if (["select"].includes(obj.type)) {
+        obj.renderLabel = item.renderLabel;
+        obj.renderOption = item.renderOption;
+        obj.renderTag = item.renderTag;
+      }
       /* 处理树形选择 */
       if (
         ["treeSelect", "select", "radio", "checkbox", "input-select"].includes(

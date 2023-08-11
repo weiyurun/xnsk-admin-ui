@@ -116,31 +116,35 @@ const localFileList = ref([]);
 watch(
   () => props.value,
   (newData) => {
+    if (newData === null || newData === undefined) {
+      emit("update:value", "");
+    }
     if ([null, undefined, ""].includes(newData)) {
       localFileList.value.splice(0);
       return;
     }
-    if (newData) {
-    }
-    let list = newData._split(",");
-    list.forEach((url) => {
-      let find_ = localFileList.value.find((file) => {
-        return file.url === url;
-      });
-      if (!find_) {
-        localFileList.value.push({
-          url: url,
-          name: getFileNameByUrl(url),
-          status: "finished",
+    if (newData?.length > 0) {
+      let list = newData.split(",");
+      list.forEach((url) => {
+        let find_ = localFileList.value.find((file) => {
+          return file.url === url;
         });
-      }
-    });
+        if (!find_) {
+          localFileList.value.push({
+            url: url,
+            name: getFileNameByUrl(url),
+            status: "finished",
+          });
+        }
+      });
+    }
   },
   { deep: true, immediate: true },
 );
 
 /* 自定义上传 */
 const customRequest = async ({ file, onFinish, onError }) => {
+  console.log("111", 111);
   let formData = new FormData();
   formData.append("file", file.file);
   formData.append("bucket", props.bucket);
