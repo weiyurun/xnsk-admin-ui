@@ -248,6 +248,9 @@ import {
   watch,
 } from "vue";
 import { getRandomId, getParentNode, diffProperty } from "../../utils";
+import { useMessage } from "naive-ui";
+
+const message = useMessage();
 
 const errMsgPrefix = {
   "input-select": "请输入",
@@ -540,6 +543,7 @@ function submitClick() {
       }
     } else {
       /* 不通过 */
+      message.error("请检查必填项")
     }
   });
 }

@@ -11,7 +11,7 @@
 </template>
 <script setup>
 import { NSpace } from "naive-ui";
-</script>
+</script> 
 <style lang="scss" scoped>
 // .form-btns {
 //   &::after {
