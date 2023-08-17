@@ -249,6 +249,7 @@ import {
 } from "vue";
 import { getRandomId, getParentNode, diffProperty } from "../../utils";
 import { useMessage } from "naive-ui";
+import { clearByCodeReg, codeReg } from "../../utils/regExp";
 
 const message = useMessage();
 
@@ -312,6 +313,12 @@ const getItems = computed(() => {
       obj.onBlur = item.onBlur || null;
       obj.clearable = item.clearable;
 
+      /* 输入框添加自动清空、自动校验 */
+      if (["input"].includes(obj?.type)) {
+        obj.clearByRegExp = item.clearByRegExp || null;
+        obj.checkByRegExp = item.checkByRegExp || null;
+      }
+
       /* 选择器的自定义渲染 */
       if (["select"].includes(obj?.type)) {
         obj.renderLabel = item.renderLabel;
@@ -341,7 +348,7 @@ const getItems = computed(() => {
             : unref(item.selection);
       } */
 
-      /* 如果必填，加入校验 */
+      /* 校验 */
       let ruleObject = {
         required: obj?.required,
         trigger: obj.trigger,
@@ -353,18 +360,26 @@ const getItems = computed(() => {
           } else if (obj?.validator?.xnsk_admin_ui_realType === undefined) {
             //如果不传校验规则
             if (obj?.required) {
-              //但设置了必填，如果是null，undefined，""，或者是空数组，返回异常
+              //但设置了必填
+
+              /* 如果设置了正则校验 */
+              if (obj?.checkByRegExp) {
+                if (!checkByRegExpHandler(value, obj?.checkByRegExp)) {
+                  return new Error(`${errMsgPrefix[obj?.type]}正确的${obj.label}`);
+                }
+              }
+              //校验空
               if (
                 [null, undefined, ""].includes(value) ||
                 (value?.xnsk_admin_ui_realType === "array" &&
                   value?.length === 0)
               ) {
                 return new Error(`${errMsgPrefix[obj?.type]}${obj.label}`);
-              } else {
-                return true;
               }
+              //都通过，返回true
+              return true;
             } else {
-              //不传校验规则，也没有设置必填，则为true
+              //不传自定义校验规则函数，也没有设置必填
               return true;
             }
           }
@@ -490,6 +505,13 @@ function cancelClick() {
 
 //监听change
 function changePropName(val, item) {
+  /* 单独处理校验规则 */
+  if (item.clearByRegExp) {
+    formResult.value[item.propName] = clearByRegExpHandler(
+      formResult.value[item.propName],
+      item.clearByRegExp,
+    );
+  }
   if (item?.onInput?.xnsk_admin_ui_realType === "function") {
     let res = item?.onInput?.(val);
     if (res !== undefined) {
@@ -511,6 +533,58 @@ function inputBlur(val, item) {
     if (res !== undefined) {
       formResult.value[item.propName] = res;
     }
+  }
+}
+
+/* 根据正则处理数据 */
+function clearByRegExpHandler(val, reg) {
+  let t = reg.xnsk_admin_ui_realType;
+  switch (t) {
+    case "regexp":
+      return val.replace(reg, "");
+    case "array":
+      reg.forEach((regItem) => {
+        if (reg.xnsk_admin_ui_realType === "regexp") {
+          val = val.replace(regItem, "");
+        }
+      });
+      return val;
+    case "string":
+      return clearByRegExpName(val, reg);
+  }
+}
+/* 根据内置的正则名称处理数据 */
+function clearByRegExpName(val, name) {
+  switch (name) {
+    case "code":
+      return clearByCodeReg(val);
+  }
+}
+/* 根据正则校验数据 */
+function checkByRegExpHandler(val, reg) {
+  let t = reg.xnsk_admin_ui_realType;
+  switch (t) {
+    case "regexp":
+      return reg.test(val);
+    case "array":
+      let bool = true;
+      for (let i = 0; i < reg.length; i++) {
+        //有任何一个正则匹配不通过，立刻返回false
+        if (!reg[i].test(val)) {
+          return false;
+        }
+      }
+      //全部通过返回true
+      return true;
+    case "string":
+      return checkByRegExpName(val, reg);
+  }
+}
+/* 根据内置的正则名称校验数据 */
+function checkByRegExpName(val, name) {
+  switch (name) {
+    case "code":
+      return codeReg.test(val);
   }
 }
 
@@ -543,7 +617,7 @@ function submitClick() {
       }
     } else {
       /* 不通过 */
-      message.error("请检查必填项")
+      message.error("请检查必填项");
     }
   });
 }
