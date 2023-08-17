@@ -1,1 +1,1 @@
-export { default as TreeSync } from "./index.vue"
+export { default as XnskTreeSync } from "./index.vue";

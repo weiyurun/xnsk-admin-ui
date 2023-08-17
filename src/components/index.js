@@ -1,13 +1,13 @@
 /* 导出 */
-export { Dialog } from "./Dialog"
-export { DialogMsg } from "./DialogMsg"
-export { BlueTitle } from "./BlueTitle"
-export { Drawer } from './Drawer'
-export { ListPage } from './ListPage'
-export { Form } from './Form'
-export { FormBtns } from './FormBtns'
-export { Info } from './Info'
-export { MarkDown } from './MarkDown'
-export { LoginAgreement } from "./LoginAgreement"
-export { TreeSync } from "./TreeSync"
-export { UploadFileList } from "./UploadFileList"
+export { XnskDialog } from "./Dialog";
+export { XnskDialogMsg } from "./DialogMsg";
+export { XnskBlueTitle } from "./BlueTitle";
+export { XnskDrawer } from "./Drawer";
+export { XnskListPage } from "./ListPage";
+export { XnskForm } from "./Form";
+export { XnskFormBtns } from "./FormBtns";
+export { XnskInfo } from "./Info";
+export { XnskMarkDown } from "./MarkDown";
+export { XnskLoginAgreement } from "./LoginAgreement";
+export { XnskTreeSync } from "./TreeSync";
+export { XnskUploadFileList } from "./UploadFileList";

@@ -1,1 +1,1 @@
-export { default as Tinymce } from "./index.vue"
+export { default as XnskTinymce } from "./index.vue";

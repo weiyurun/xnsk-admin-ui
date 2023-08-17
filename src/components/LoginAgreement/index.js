@@ -1,1 +1,1 @@
-export { default as LoginAgreement } from "./index.vue"
+export { default as XnskLoginAgreement } from "./index.vue";

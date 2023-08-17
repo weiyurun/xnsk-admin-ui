@@ -1,1 +1,1 @@
-export { default as Drawer } from "./index.vue"
+export { default as XnskDrawer } from "./index.vue";

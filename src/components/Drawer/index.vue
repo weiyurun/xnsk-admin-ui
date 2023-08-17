@@ -1,10 +1,11 @@
 <template>
   <n-drawer
-    :close-on-esc="outClosable"
-    :mask-closable="outClosable"
+    :close-on-esc="false"
+    :mask-closable="false"
     :auto-focus="false"
     :trap-focus="false"
     v-bind="attrs"
+    @mask-click="maskClick"
   >
     <n-drawer-content :title="title" closable>
       <slot></slot>
@@ -17,6 +18,7 @@ import { onMounted, useAttrs } from "vue";
 import { NDrawer, NDrawerContent } from "naive-ui";
 
 const attrs = useAttrs();
+const emits = defineEmits(["upload:show"]);
 const props = defineProps({
   title: {
     type: String,
@@ -27,6 +29,22 @@ const props = defineProps({
     default: () => false,
   },
 });
+function maskClick() {
+  if (props.outClosable) {
+    emits("update:show", false);
+  } else {
+    $dialog.warning({
+      title: "确定关闭",
+      content: "",
+      positiveText: "确定",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        emits("update:show", false);
+      },
+      onNegativeClick: () => {},
+    });
+  }
+}
 onMounted(() => {});
 </script>
 

@@ -1,1 +1,1 @@
-export { default as ListPage } from "./index.vue"
+export { default as XnskListPage } from "./index.vue";

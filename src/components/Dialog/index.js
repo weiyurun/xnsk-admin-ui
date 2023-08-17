@@ -1,1 +1,1 @@
-export { default as Dialog } from "./index.vue"
+export { default as XnskDialog } from "./index.vue";

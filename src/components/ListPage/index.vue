@@ -1,6 +1,6 @@
 <!--
     列表页组件
-    <ListPage :config="config" />
+    <XnskListPage :config="config" />
     参数说明：
     config：
       expand [Function]: 行展开事件，不写就是不可展开
@@ -79,12 +79,12 @@
         class="list-page-search marB20"
         v-if="searchItems.length > 0 && !config.params.hidden"
       >
-        <n-grid x-gap="12" cols="3 s:3 m:4 l:5 xl:6" responsive="screen">
+        <n-grid x-gap="12" cols="24" responsive="screen">
           <template v-for="(item, index) in searchItems">
-            <n-gi v-if="!item.hidden" :key="index">
+            <n-gi v-if="!item.hidden" :key="index" :span="item.span || 6">
               <!-- 输入框 -->
               <n-input
-                v-if="item.type === 'input'"
+                v-if="item?.type === 'input'"
                 v-model:value="params[item.propName]"
                 :placeholder="item.placeholder || '请输入' + item.label"
                 clearable
@@ -96,7 +96,7 @@
               </n-input>
               <!-- 下拉框 -->
               <n-select
-                v-if="item.type === 'select'"
+                v-if="item?.type === 'select'"
                 v-model:value="params[item.propName]"
                 :options="getSelection(item.selection)"
                 :placeholder="item.placeholder || '请选择' + item.label"
@@ -108,7 +108,7 @@
             </n-gi>
           </template>
 
-          <n-gi :suffix="true">
+          <n-gi :suffix="true" span="6">
             <div class="flex-1 justify-end flex">
               <n-button type="primary" @click="searchClick">
                 <template #icon>
@@ -135,9 +135,9 @@
       <div
         v-if="props?.config?.table?.title || props?.config?.table?.headBtns"
         class="overflow-hidden flex items-center justify-between"
-        style="margin-bottom: 24px"
+        style="margin-bottom: 20px"
       >
-        <blue-title
+        <XnskBlueTitle
           size="16px"
           v-if="props?.config?.table?.title"
           :title="getTitle"
@@ -147,7 +147,7 @@
             v-for="(item, index) in props?.config?.table?.headBtns || []"
           >
             <n-button
-              :type="item.type || 'primary'"
+              :type="item?.type || 'primary'"
               class="marL20"
               v-if="getHeadBtnShow(item)"
               :key="index"
@@ -226,7 +226,7 @@
 
 <script setup>
 import { getRandomId, addRandomID } from "../../utils";
-import { BlueTitle, Dialog } from "../index";
+import { XnskBlueTitle, XnskDialog } from "../index";
 import {
   NButton,
   NIcon,
@@ -324,10 +324,10 @@ let pageData = ref({});
 function initParams() {
   if (searchItems.value.length) {
     searchItems.value.forEach((item) => {
-      if (item.type === "input") {
+      if (item?.type === "input") {
         params.value[item.propName] =
           item?.defaultValue?.xnsk_admin_ui_realValue || "";
-      } else if (item.type === "select") {
+      } else if (item?.type === "select") {
         params.value[item.propName] =
           item.defaultValue === "" || item.defaultValue === undefined
             ? null
@@ -377,7 +377,7 @@ function initTableColumns() {
     /* 2023.8.2 更新，去除了以前的对于width和minWidth的处理，因为暂时没有完美方案，先用组件自带的方案处理 */
     /* 理想中的方案：设置width表示此列固定宽，无需均分；minWidth表示此列最小值，有溢出空间则参与均分，
     目前组件自带方案有问题，当有多列设置了minWidth，它们被强行均分了（不知道是故意还是bug） */
-    if (item.type !== "selection") {
+    if (item?.type !== "selection") {
     }
 
     /* 操作栏统一固定右侧 */
@@ -434,7 +434,7 @@ function initTableColumns() {
                     size: "small",
                     /* loading: _loading, */
                     quaternary: true,
-                    type: item.type || "primary",
+                    type: item?.type || "primary",
                     disabled: _disabled,
                     onClick: () => {
                       if (item?.autoWarn) {
@@ -560,7 +560,19 @@ function getTableData(newParams = {}, callback = null) {
         pagination.value.page = res.pageNum || res.data.pageNum || 1;
         emit("success", pageData.value);
       } else {
-        props?.config?.showErrMsg && $message.error(res.message);
+        if (
+          props?.config?.onError &&
+          props?.config?.onError.xnsk_admin_ui_realType === "function"
+        ) {
+          props.config.onError(res);
+        } else if (
+          attrs.onError &&
+          attrs.onError.xnsk_admin_ui_realType === "function"
+        ) {
+          attrs.onError(res);
+        } else {
+          $message.error(res.message);
+        }
       }
     })
     /*    .catch((err) => {
@@ -574,12 +586,17 @@ function getTableData(newParams = {}, callback = null) {
 /* onload事件 */
 function onLoad(row) {
   return new Promise((resolve, reject) => {
-    emit("rowLoad", row, (data = []) => {
+    let cb = (data = []) => {
       row.children = data.map((i) => {
         return { ...i };
       });
       resolve();
-    });
+    };
+    if (props.config?.rowLoad?.xnsk_admin_ui_realType === "function") {
+      props.config?.rowLoad(row, cb);
+    } else {
+      emit("rowLoad", row, cb);
+    }
   });
 }
 /* 树形，默认展开的行 */

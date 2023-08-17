@@ -144,7 +144,6 @@ watch(
 
 /* 自定义上传 */
 const customRequest = async ({ file, onFinish, onError }) => {
-  console.log("111", 111);
   let formData = new FormData();
   formData.append("file", file.file);
   formData.append("bucket", props.bucket);
@@ -156,7 +155,6 @@ const customRequest = async ({ file, onFinish, onError }) => {
   });
   loading.value = true;
   let res = await http(props.url, {
-    "Content-Type": "multipart/form-data;charset=UTF-8",
     token: props.token,
   })(formData);
   loading.value = false;

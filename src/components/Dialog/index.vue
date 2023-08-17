@@ -14,7 +14,7 @@
   ……其他参数/功能持续维护
 
   样例：
-  <xn-dialog
+  <xnsk-dialog
     title="标题"
     v-model:show="true"
     width="600"
@@ -24,7 +24,7 @@
     @beforeClose="beforeClose"
   >
     /* 弹窗主体内容 */
-  </xn-dialog>
+  </xnsk-dialog>
 <script setup>
   import { useDialog } from 'naive-ui'
   const dialog = useDialog()
@@ -59,7 +59,7 @@
     }"
   >
     <template #header>
-      <BlueTitle v-if="title" :title="title" />
+      <XnskBlueTitle v-if="title" :title="title" />
     </template>
     <template #default>
       <slot></slot>
@@ -88,10 +88,6 @@
   </n-modal>
 </template>
 <script>
-/* import { defineComponent } from "vue";
-export default defineComponent({
-  name: "XnDialog",
-}); */
 </script>
 <script setup>
 import { useDialog, NModal, NButton } from "naive-ui";
@@ -104,7 +100,7 @@ import {
   useAttrs,
   watchEffect,
 } from "vue";
-import { BlueTitle } from "../index";
+import { XnskBlueTitle } from "../index";
 
 const emit = defineEmits(["update:show"]);
 const attrs = useAttrs();

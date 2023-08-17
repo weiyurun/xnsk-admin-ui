@@ -52,21 +52,21 @@ defaultValue [Object] 默认值
       <n-grid x-gap="12" :cols="24">
         <n-gi
           v-for="item in getItems"
-          :class="{ 'is-slot': item.type === 'slot' && !item.useFormItem }"
+          :class="{ 'is-slot': item?.type === 'slot' && !item.useFormItem }"
           :key="item.propName"
           :span="item.span"
           :offset="item.offset"
         >
           <n-form-item
             :label="
-              item.type === 'slot' && !item.useFormItem ? null : item.label
+              item?.type === 'slot' && !item.useFormItem ? null : item.label
             "
             :path="item.propName"
           >
             <!-- 单行输入框 -->
             <n-input
               v-trim
-              v-if="item.type === 'input'"
+              v-if="item?.type === 'input'"
               v-model:value="formResult[item.propName]"
               :placeholder="getPlaceholder(item)"
               :maxlength="item.maxlength || 20"
@@ -78,7 +78,7 @@ defaultValue [Object] 默认值
             />
             <!-- 可输入，可选择 -->
             <n-select
-              v-if="item.type === 'input-select'"
+              v-if="item?.type === 'input-select'"
               class="input-select-select"
               :value="formResult[item.propName]"
               :options="getSelection(item)"
@@ -107,7 +107,7 @@ defaultValue [Object] 默认值
             <!-- 多行输入 -->
             <n-input
               v-trim
-              v-if="item.type === 'textarea'"
+              v-if="item?.type === 'textarea'"
               v-model:value="formResult[item.propName]"
               type="textarea"
               :placeholder="getPlaceholder(item)"
@@ -121,7 +121,7 @@ defaultValue [Object] 默认值
             />
             <!-- 选择框 -->
             <n-select
-              v-if="item.type === 'select'"
+              v-if="item?.type === 'select'"
               v-model:value="formResult[item.propName]"
               :options="getSelection(item)"
               :placeholder="getPlaceholder(item)"
@@ -138,7 +138,7 @@ defaultValue [Object] 默认值
             />
             <!-- 树形选择框 -->
             <n-tree-select
-              v-if="item.type === 'treeSelect'"
+              v-if="item?.type === 'treeSelect'"
               v-model:value="formResult[item.propName]"
               :options="getSelection(item)"
               :disabled="item.disabled"
@@ -151,7 +151,7 @@ defaultValue [Object] 默认值
             />
             <!-- 单选框 -->
             <n-radio-group
-              v-if="item.type === 'radio'"
+              v-if="item?.type === 'radio'"
               v-model:value="formResult[item.propName]"
               @update:value="(e) => changePropName(e, item)"
               :name="item.propName"
@@ -170,7 +170,7 @@ defaultValue [Object] 默认值
             </n-radio-group>
             <!-- 复选框 -->
             <n-checkbox-group
-              v-if="item.type === 'checkbox'"
+              v-if="item?.type === 'checkbox'"
               v-model:value="formResult[item.propName]"
             >
               <n-space item-style="display: flex;">
@@ -183,7 +183,7 @@ defaultValue [Object] 默认值
               </n-space>
             </n-checkbox-group>
             <!-- 提示文字 -->
-            <span v-if="item.type === 'text'" :style="item.style">
+            <span v-if="item?.type === 'text'" :style="item.style">
               {{
                 item.text?.xnsk_admin_ui_realType === "function"
                   ? item.text()
@@ -191,7 +191,7 @@ defaultValue [Object] 默认值
               }}
             </span>
             <slot
-              v-if="item.type === 'slot'"
+              v-if="item?.type === 'slot'"
               :name="item.propName"
               :data="formResult"
               :item="item"
@@ -201,7 +201,7 @@ defaultValue [Object] 默认值
       </n-grid>
     </n-form>
     <template v-if="!slot.btns">
-      <form-btns>
+      <XnskFormBtns>
         <n-button
           v-if="config?.submitBtn"
           type="primary"
@@ -214,14 +214,14 @@ defaultValue [Object] 默认值
         <n-button v-if="config?.submitBtn" @click="cancelClick">
           取消
         </n-button>
-      </form-btns>
+      </XnskFormBtns>
     </template>
     <slot v-if="slot.btns" name="btns"></slot>
   </div>
 </template>
 
 <script setup>
-import { FormBtns } from "../FormBtns";
+import { XnskFormBtns } from "../index";
 import {
   NForm,
   NFormItem,
@@ -297,7 +297,7 @@ const getItems = computed(() => {
     props.config.columns.forEach((item) => {
       let obj = {};
       obj.label = item.label;
-      obj.type = item.type;
+      obj.type = item?.type;
       obj.useFormItem = item.useFormItem || false;
       obj.propName = item.propName;
       obj.required = item.required || false;
@@ -313,7 +313,7 @@ const getItems = computed(() => {
       obj.clearable = item.clearable;
 
       /* 选择器的自定义渲染 */
-      if (["select"].includes(obj.type)) {
+      if (["select"].includes(obj?.type)) {
         obj.renderLabel = item.renderLabel;
         obj.renderOption = item.renderOption;
         obj.renderTag = item.renderTag;
@@ -321,7 +321,7 @@ const getItems = computed(() => {
       /* 处理树形选择 */
       if (
         ["treeSelect", "select", "radio", "checkbox", "input-select"].includes(
-          obj.type,
+          obj?.type,
         )
       ) {
         obj.selectionLabelKey = item.selectionLabelKey || "label";
@@ -334,7 +334,7 @@ const getItems = computed(() => {
 
       /* 备选项 */
       //注释掉，不能在这里写，如果备选项是异步获取并且网速极慢，会在填写表单时重置表单，因为计算属性重新执行了
-      /* if (item.type === "select") {
+      /* if (item?.type === "select") {
         obj.selection =
           item.selection.xnsk_admin_ui_realType === "function"
             ? unref(item.selection())
@@ -359,7 +359,7 @@ const getItems = computed(() => {
                 (value?.xnsk_admin_ui_realType === "array" &&
                   value?.length === 0)
               ) {
-                return new Error(`${errMsgPrefix[obj.type]}${obj.label}`);
+                return new Error(`${errMsgPrefix[obj?.type]}${obj.label}`);
               } else {
                 return true;
               }
@@ -430,7 +430,7 @@ watch(
 function initForm() {
   let items = props.config?.columns || [];
   items.forEach((item) => {
-    switch (item.type) {
+    switch (item?.type) {
       case "input":
       case "textarea":
         item.propName && (formResult.value[item.propName] = "");
@@ -445,7 +445,7 @@ function initForm() {
 function getPlaceholder(item) {
   /* 如果未传入placeholder */
   if (!item.placeholder) {
-    if (item.type === "select") {
+    if (item?.type === "select") {
       return `请选择${item.label}`;
     } else {
       return `请输入${item.label}`;
@@ -475,7 +475,7 @@ function getSelection(item) {
 /* 获取默认值 */
 function getDefaultValue(item) {
   return (
-    props.defaultValue?.[item.propName] ?? (item.type === "select" ? null : "")
+    props.defaultValue?.[item.propName] ?? (item?.type === "select" ? null : "")
   );
 }
 
@@ -600,9 +600,9 @@ defineExpose({
     display: none;
   }
 }
-:deep(.n-form-item) {
-  .n-form-item-label {
-    line-height: inherit;
-  }
-}
+// :deep(.n-form-item) {
+//   .n-form-item-label {
+//     line-height: inherit;
+//   }
+// }
 </style>

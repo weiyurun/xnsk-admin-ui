@@ -163,7 +163,7 @@ export function getSuffixName(_name = "", _mark = "") {
  * @param {String} className 要查询的className
  * @returns Element || undefined
  */
-function getParentNode(el, className = "") {
+export function getParentNode(el, className = "") {
   let find = el;
   while (
     find.parentNode.className.split(" ").indexOf(className) === -1 &&

@@ -1,1 +1,1 @@
-export { default as BlueTitle } from "./index.vue"
+export { default as XnskBlueTitle } from "./index.vue";

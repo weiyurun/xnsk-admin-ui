@@ -6,7 +6,7 @@
     />
 -->
 <template>
-  <Dialog :title="title" v-model:show="isShow" width="800" :callback="[]">
+  <XnskDialog :title="title" v-model:show="isShow" width="800" :callback="[]">
     <div class="break-all">
       {{ data }}
     </div>
@@ -23,11 +23,11 @@
         </n-button>
       </div>
     </template>
-  </Dialog>
+  </XnskDialog>
 </template>
 
 <script setup>
-import { Dialog } from "../index";
+import { XnskDialog } from "../index";
 import { computed, useSlots } from "vue";
 import { writeToClipBoard } from "../../utils";
 import { NButton } from "naive-ui";

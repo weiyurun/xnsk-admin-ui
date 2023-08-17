@@ -16,18 +16,18 @@
     <textarea :id="_ID" cols="30" rows="10"></textarea>
     <!-- 自定义图片上传 -->
     <div style="position: absolute; z-index: -1">
-      <XnskUploadFile accept=".png,.jpg,.jpeg" @change="uploadCallback">
+      <UploadFile accept=".png,.jpg,.jpeg" @change="uploadCallback">
         <template #uploadBtn>
           <span :id="'uploadBtn_' + _ID"></span>
         </template>
-      </XnskUploadFile>
+      </UploadFile>
     </div>
   </div>
 </template>
 
 <script setup>
 import { nextTick, onMounted, reactive, ref, unref, watch } from "vue";
-import { XnskUploadFile } from "@/components";
+import { UploadFile } from "@/components";
 import { getRandomId } from "@/utils/random";
 import "#/tinymce/tinymce.min.js";
 import "#/tinymce/themes/silver/theme.min.js";

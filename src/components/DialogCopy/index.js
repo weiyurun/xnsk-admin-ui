@@ -1,1 +1,1 @@
-export { default as DialogCopy } from "./index.vue";
+export { default as XnskDialogCopy } from "./index.vue";

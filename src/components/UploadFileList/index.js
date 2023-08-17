@@ -1,1 +1,1 @@
-export { default as UploadFileList } from "./index.vue"
+export { default as XnskUploadFileList } from "./index.vue";

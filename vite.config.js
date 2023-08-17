@@ -46,9 +46,9 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => {
-            return tag.startsWith("xnsk-") || tag.startsWith("Xnsk");
-          },
+          // isCustomElement: (tag) => {
+          //   return tag.startsWith("xnsk-") || tag.startsWith("Xnsk") || false;
+          // },
         },
       },
     }),

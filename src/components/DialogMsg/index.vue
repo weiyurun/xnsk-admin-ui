@@ -1,12 +1,12 @@
 <!--
   案例：
-  <xn-dialog-msg
+  <xnsk-dialog-msg
       v-model:show=""
       data="我是日志的内容"
     />
 -->
 <template>
-  <Dialog
+  <XnskDialog
     :title="title"
     v-model:show="isShow"
     width="800"
@@ -28,11 +28,11 @@
         </n-button>
       </div>
     </template>
-  </Dialog>
+  </XnskDialog>
 </template>
 
 <script setup>
-import { Dialog } from "../index";
+import { XnskDialog } from "../index";
 import { computed, useSlots } from "vue";
 import { writeToClipBoard } from "../../utils";
 import { NButton } from "naive-ui";

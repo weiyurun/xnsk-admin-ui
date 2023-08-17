@@ -1,1 +1,1 @@
-export { default as FormBtns } from "./index.vue"
+export { default as XnskFormBtns } from "./index.vue";

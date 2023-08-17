@@ -1,1 +1,1 @@
-export { default as MarkDown } from "./index.vue"
+export { default as XnskMarkDown } from "./index.vue";

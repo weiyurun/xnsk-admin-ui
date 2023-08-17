@@ -1,1 +1,1 @@
-export { default as Info } from "./index.vue"
+export { default as XnskInfo } from "./index.vue";

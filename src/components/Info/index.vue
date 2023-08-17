@@ -18,7 +18,7 @@
 -->
 <template>
   <div>
-    <BlueTitle
+    <XnskBlueTitle
       class="marT5 marB15"
       v-if="config.title"
       :title="config.title || ''"
@@ -58,7 +58,7 @@
 
 <script setup>
 import { useAttrs } from "vue";
-import { BlueTitle } from "../index";
+import { XnskBlueTitle } from "../index";
 import { NGrid, NGi } from "naive-ui";
 const attrs = useAttrs();
 const props = defineProps({

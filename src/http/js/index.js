@@ -1,9 +1,11 @@
 import axios from "axios";
 const post = (axios_, config_, url = "", data = {}, extendsConfig = {}) => {
+  // axios_.interceptors.request.clear();
   axios_.interceptors.request.use((request) => {
     if (config_.beforeRequest) {
       config_.beforeRequest(request, extendsConfig ?? {});
     }
+    console.log('request', request)
     return request;
   });
   return new Promise((resolve, reject) => {
@@ -24,14 +26,14 @@ const post = (axios_, config_, url = "", data = {}, extendsConfig = {}) => {
               message: err?.message || "系统异常",
             },
           },
-          extendsConfig ?? {}
+          extendsConfig ?? {},
         );
         resolve(
           err?.response?.data ?? {
             status: 500,
             data: null,
             message: err.message,
-          }
+          },
         );
       })
       .finally(() => {});
@@ -135,7 +137,7 @@ function useMiniHttp(args = null) {
         {
           ...(extendsConfig || {}),
           ...(EC || {}),
-        }
+        },
       );
     };
   };

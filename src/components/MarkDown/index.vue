@@ -14,11 +14,11 @@
     <n-empty v-else description="无数据" style="margin-top: 60px"></n-empty>
   </div>
 </template>
-<script>
+<!-- <script>
 export default {
   name: "XnskMdPreview",
 };
-</script>
+</script> -->
 <script setup>
 import { getFileContentByUrl } from "../../utils";
 import { ref, watchEffect } from "vue";
@@ -54,7 +54,7 @@ async function getFilel() {
 /* 判断type是否为url */
 watchEffect(() => {
   if (props.value) {
-    if (props.type === "url") {
+    if (props?.type === "url") {
       getFilel();
     } else {
       valueResult.value = md.render(props.value);
