@@ -4,6 +4,7 @@
     :mask-closable="false"
     :auto-focus="false"
     :trap-focus="false"
+    :width="width"
     v-bind="attrs"
     @mask-click="maskClick"
   >
@@ -23,6 +24,10 @@ const props = defineProps({
   title: {
     type: String,
     default: "",
+  },
+  width: {
+    type: Number,
+    default: 500,
   },
   outClosable: {
     type: Boolean,

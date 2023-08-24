@@ -1,6 +1,6 @@
 {
   "name": "xnsk-admin-ui",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "type": "module",
   "main": "lib/xnsk-admin-ui.js",
   "scripts": {

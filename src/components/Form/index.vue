@@ -302,7 +302,7 @@ const getItems = computed(() => {
       obj.useFormItem = item.useFormItem || false;
       obj.propName = item.propName;
       obj.required = item.required || false;
-      obj.maxlength = item.maxlength;
+      obj.maxlength = item.maxlength || item.maxLength;
       obj.rows = item.rows || 9;
       obj.validator = item.validator || null;
       obj.trigger = item.trigger || props.config?.trigger || "blur";
@@ -365,7 +365,9 @@ const getItems = computed(() => {
               /* 如果设置了正则校验 */
               if (obj?.checkByRegExp) {
                 if (!checkByRegExpHandler(value, obj?.checkByRegExp)) {
-                  return new Error(`${errMsgPrefix[obj?.type]}正确的${obj.label}`);
+                  return new Error(
+                    `${errMsgPrefix[obj?.type]}正确的${obj.label}`,
+                  );
                 }
               }
               //校验空

@@ -11,3 +11,4 @@ export { XnskMarkDown } from "./MarkDown";
 export { XnskLoginAgreement } from "./LoginAgreement";
 export { XnskTreeSync } from "./TreeSync";
 export { XnskUploadFileList } from "./UploadFileList";
+export { XnskEditTable } from "./EditTable";

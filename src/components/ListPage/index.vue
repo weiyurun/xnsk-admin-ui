@@ -486,7 +486,7 @@ function initTableColumns() {
         );
       };
     }
-    return { ...obj, ...item };
+    return { ...item, ...obj };
   });
   /* 行是否可展开 */
   if (props?.config?.expand) {
