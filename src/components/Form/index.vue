@@ -208,7 +208,6 @@ defaultValue [Object] 默认值
           type="primary"
           :loading="submitLoading"
           @click="submitClick"
-          class="m"
         >
           {{ config?.submitBtn?.label || "确定" }}
         </n-button>
@@ -275,8 +274,8 @@ const slot = useSlots();
 const emit = defineEmits(["submit", "cancel", "change", "update:value"]);
 const attrs = useAttrs();
 const props = defineProps({
-  value: {
-    type: Object,
+  value:{
+     type: Object,
     default: {},
   },
   config: {
