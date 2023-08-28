@@ -49,13 +49,14 @@ defaultValue [Object] 默认值
       :label-width="config.labelWidth || 'auto'"
       require-mark-placement="right"
     >
-      <n-grid x-gap="12" :cols="24">
+      <n-grid x-gap="12" :cols="24" item-responsive responsive="screen">
         <n-gi
           v-for="item in getItems"
           :class="{ 'is-slot': item?.type === 'slot' && !item.useFormItem }"
           :key="item.propName"
           :span="item.span"
           :offset="item.offset"
+          :style="item?.style || null"
         >
           <n-form-item
             :label="
@@ -227,6 +228,7 @@ import {
   NFormItem,
   NGrid,
   NGi,
+  NGridItem,
   NCheckboxGroup,
   NCheckbox,
   NRadioGroup,
@@ -249,7 +251,12 @@ import {
 } from "vue";
 import { getRandomId, getParentNode, diffProperty } from "../../utils";
 import { useMessage } from "naive-ui";
-import { clearByCodeReg, codeReg } from "../../utils/regExp";
+import {
+  clearByCodeReg,
+  codeReg,
+  clearByNumberReg,
+  numberReg,
+} from "../../utils/regExp";
 
 const message = useMessage();
 
@@ -265,9 +272,13 @@ const errMsgPrefix = {
 const formId = ref("from_" + getRandomId());
 
 const slot = useSlots();
-const emit = defineEmits(["submit", "cancel", "change"]);
+const emit = defineEmits(["submit", "cancel", "change", "update:value"]);
 const attrs = useAttrs();
 const props = defineProps({
+  value: {
+    type: Object,
+    default: {},
+  },
   config: {
     type: Object,
     default: {},
@@ -560,6 +571,8 @@ function clearByRegExpName(val, name) {
   switch (name) {
     case "code":
       return clearByCodeReg(val);
+    case "number":
+      return clearByNumberReg(val);
   }
 }
 /* 根据正则校验数据 */
@@ -587,6 +600,8 @@ function checkByRegExpName(val, name) {
   switch (name) {
     case "code":
       return codeReg.test(val);
+    case "code":
+      return numberReg.test(val);
   }
 }
 
