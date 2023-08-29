@@ -26,7 +26,7 @@ const props = defineProps({
     default: "",
   },
   width: {
-    type: Number,
+    type: [Number, String],
     default: 500,
   },
   outClosable: {

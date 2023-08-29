@@ -58,7 +58,9 @@ defaultValue [Object] 默认值
           :offset="item.offset"
           :style="item?.style || null"
         >
+          <slot v-if="item.onlyUseSpace" :name="item.propName"></slot>
           <n-form-item
+            v-else
             :label="
               item?.type === 'slot' && !item.useFormItem ? null : item.label
             "
@@ -237,6 +239,7 @@ import {
   NInput,
   NMention,
   NTreeSelect,
+  NSpace,
 } from "naive-ui";
 import {
   computed,
@@ -274,8 +277,8 @@ const slot = useSlots();
 const emit = defineEmits(["submit", "cancel", "change", "update:value"]);
 const attrs = useAttrs();
 const props = defineProps({
-  value:{
-     type: Object,
+  value: {
+    type: Object,
     default: {},
   },
   config: {
