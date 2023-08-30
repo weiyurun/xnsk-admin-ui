@@ -179,6 +179,7 @@ export function getParentNode(el, className = "") {
 /* 对比两个对象差异属性（简版） */
 export function diffProperty(obj1, obj2) {
   let result = {};
+  //遍历obj1所有属性（此时只能检测改变和新增的属性）
   for (let key in obj1) {
     if (obj2?.[key] && obj1?.[key] === obj2?.[key]) {
       continue;
@@ -189,7 +190,13 @@ export function diffProperty(obj1, obj2) {
         result[key] = difference;
       }
     } else {
-      result[key] = obj2?.[key];
+      result[key] = obj1?.[key];
+    }
+  }
+  //检测删除的属性
+  for (let key in obj2) {
+    if (!obj1.hasOwnProperty(key)) {
+      result[key] = "";
     }
   }
   return result;

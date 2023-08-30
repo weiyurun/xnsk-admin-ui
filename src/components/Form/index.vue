@@ -443,7 +443,7 @@ initForm();
 watch(
   () => props.defaultValue,
   (newVal, oldVal) => {
-    let diff = diffProperty(newVal, oldVal);
+    let diff = diffProperty(newVal, formResult.value);
     let keys = Object.keys(diff);
     keys.forEach((key) => {
       let findItem = props.config?.columns.find(
@@ -528,7 +528,7 @@ function changePropName(val, item) {
     );
   }
   if (item?.onInput?.xnsk_admin_ui_realType === "function") {
-    let res = item?.onInput?.(val);
+    let res = item?.onInput?.(val,item);
     if (res !== undefined) {
       formResult.value[item.propName] = res;
     }
