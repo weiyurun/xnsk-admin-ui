@@ -204,18 +204,11 @@ defaultValue [Object] 默认值
       </n-grid>
     </n-form>
     <template v-if="!slot.btns">
-      <XnskFormBtns>
-        <n-button
-          v-if="config?.submitBtn"
-          type="primary"
-          :loading="submitLoading"
-          @click="submitClick"
-        >
+      <XnskFormBtns v-if="config?.submitBtn">
+        <n-button type="primary" :loading="submitLoading" @click="submitClick">
           {{ config?.submitBtn?.label || "确定" }}
         </n-button>
-        <n-button v-if="config?.submitBtn" @click="cancelClick">
-          取消
-        </n-button>
+        <n-button @click="cancelClick"> 取消 </n-button>
       </XnskFormBtns>
     </template>
     <slot v-if="slot.btns" name="btns"></slot>
@@ -325,6 +318,7 @@ const getItems = computed(() => {
       obj.onInput = item.onInput || null;
       obj.onBlur = item.onBlur || null;
       obj.clearable = item.clearable;
+      obj.placeholder = item.placeholder;
 
       /* 输入框添加自动清空、自动校验 */
       if (["input"].includes(obj?.type)) {
@@ -440,23 +434,38 @@ initForm();
 //     findItem && (formResult.value[key] = getDefaultValue(findItem));
 //   });
 // });
+/* 监听默认值 */
 watch(
   () => props.defaultValue,
   (newVal, oldVal) => {
-    let diff = diffProperty(newVal, formResult.value);
-    let keys = Object.keys(diff);
-    keys.forEach((key) => {
-      let findItem = props.config?.columns.find(
-        (item) => item.propName === key,
-      );
-      findItem && (formResult.value[key] = getDefaultValue(findItem));
-    });
+    initValue(newVal);
   },
   {
     deep: true,
     immediate: true,
   },
 );
+/* 监听v-model */
+watch(
+  () => props.value,
+  (newVal, oldVal) => {
+    initValue(newVal, "value");
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+);
+
+/* 把处理外部值单独拿出来，因为defaultValue和v-model:value都是这套逻辑 */
+function initValue(newVal, from = "defaultValue") {
+  let diff = diffProperty(newVal, formResult.value);
+  let keys = Object.keys(diff);
+  keys.forEach((key) => {
+    let findItem = props.config?.columns.find((item) => item.propName === key);
+    findItem && (formResult.value[key] = getDefaultValue(findItem, from));
+  });
+}
 function initForm() {
   let items = props.config?.columns || [];
   items.forEach((item) => {
@@ -503,10 +512,8 @@ function getSelection(item) {
   }
 }
 /* 获取默认值 */
-function getDefaultValue(item) {
-  return (
-    props.defaultValue?.[item.propName] ?? (item?.type === "select" ? null : "")
-  );
+function getDefaultValue(item, from) {
+  return props[from]?.[item.propName] ?? (item?.type === "select" ? null : "");
 }
 
 /* 点击取消 */
@@ -528,7 +535,7 @@ function changePropName(val, item) {
     );
   }
   if (item?.onInput?.xnsk_admin_ui_realType === "function") {
-    let res = item?.onInput?.(val,item);
+    let res = item?.onInput?.(val, item);
     if (res !== undefined) {
       formResult.value[item.propName] = res;
     }
@@ -539,7 +546,9 @@ function changePropName(val, item) {
   } else {
     emit("change", unref(formResult.value), item, val);
   }
-  //通知更新，返回修改项
+
+  //2023.9.1 添加双向绑定
+  emit("update:value", unref(formResult.value));
 }
 //监听blur
 function inputBlur(val, item) {

@@ -25,7 +25,11 @@
     />
     <n-grid :class="{ 'has-border': config?.border }">
       <n-gi
-        class="info-page-item flex items-baseline"
+        class="info-page-item items-start padT10 padB10"
+        :class="{
+          block: item.flex === false,
+          'inline-flex': item.flex !== false,
+        }"
         v-for="(item, index) in config?.column || []"
         :key="item?.did || index"
         :span="item.span ?? 8"
@@ -35,7 +39,7 @@
           <slot :name="item.labelSlot"></slot>
         </template>
         <span
-          class="info-page-label inline-block padT10 padB10 padR10"
+          class="info-page-label inline-block padR10"
           else
           :style="{
             minWidth: config.labelWidth ? config.labelWidth + 'px' : 'auto',
