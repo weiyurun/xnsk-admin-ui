@@ -349,7 +349,6 @@ function initTableColumns() {
       align:
         props?.config?.isTree && index === 0 ? "left" : item.align || "center",
       titleAlign: "center",
-      resizable: false,
       /* ...item, */
     };
     /* 自定义内容，支持String和slot */
