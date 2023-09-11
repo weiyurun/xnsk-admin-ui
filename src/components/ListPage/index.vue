@@ -629,8 +629,8 @@ async function searchReset() {
   for (let p in params.value) {
     let findItem = searchItems.value.find((i) => i.propName === p);
     if (findItem) {
-      if (!findItem?.readOnly?.realValue && !findItem?.hidden?.realValue) {
-        params.value[p] = findItem?.defaultValue?.realValue ?? null;
+      if (!findItem?.readOnly?.xnsk_admin_ui_realValue && !findItem?.hidden?.xnsk_admin_ui_realValue) {
+        params.value[p] = findItem?.defaultValue?.xnsk_admin_ui_realValue ?? null;
       }
     }
   }
