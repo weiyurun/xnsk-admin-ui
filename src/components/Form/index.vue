@@ -434,17 +434,6 @@ initForm();
 //     findItem && (formResult.value[key] = getDefaultValue(findItem));
 //   });
 // });
-/* 监听默认值 */
-watch(
-  () => props.defaultValue,
-  (newVal, oldVal) => {
-    initValue(newVal);
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-);
 /* 监听v-model */
 watch(
   () => props.value,
@@ -456,9 +445,21 @@ watch(
     immediate: true,
   },
 );
+/* 监听默认值 */
+watch(
+  () => props.defaultValue,
+  (newVal, oldVal) => {
+    initValue(newVal);
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+);
 
 /* 把处理外部值单独拿出来，因为defaultValue和v-model:value都是这套逻辑 */
 function initValue(newVal, from = "defaultValue") {
+  console.log("newVal", newVal, from);
   let diff = diffProperty(newVal, formResult.value);
   let keys = Object.keys(diff);
   keys.forEach((key) => {
@@ -546,7 +547,6 @@ function changePropName(val, item) {
   } else {
     emit("change", unref(formResult.value), item, val);
   }
-
   //2023.9.1 添加双向绑定
   emit("update:value", unref(formResult.value));
 }
