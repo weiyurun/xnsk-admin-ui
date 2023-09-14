@@ -459,7 +459,6 @@ watch(
 
 /* 把处理外部值单独拿出来，因为defaultValue和v-model:value都是这套逻辑 */
 function initValue(newVal, from = "defaultValue") {
-  console.log("newVal", newVal, from);
   let diff = diffProperty(newVal, formResult.value);
   let keys = Object.keys(diff);
   keys.forEach((key) => {
