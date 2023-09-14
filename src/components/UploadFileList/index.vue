@@ -173,7 +173,11 @@ function handleRemove(data) {}
 
 async function beforeUpload(file) {
   //判断格式
-  if (attrs?.accept?.indexOf(getSuffixName(file.file.name, ".")) === -1) {
+  if (
+    attrs?.accept?.indexOf(
+      getSuffixName(file.file.name?.toLowerCase(), "."),
+    ) === -1
+  ) {
     $message.error("格式不正确");
     return false;
   }
