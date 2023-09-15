@@ -272,15 +272,13 @@ const attrs = useAttrs();
 const props = defineProps({
   value: {
     type: Object,
-    default: {},
   },
   config: {
     type: Object,
-    default: {},
+    default: () => {},
   },
   defaultValue: {
     type: Object,
-    default: {},
   },
 });
 /* form结果 */
@@ -438,7 +436,7 @@ initForm();
 watch(
   () => props.value,
   (newVal, oldVal) => {
-    initValue(newVal, "value");
+    newVal !== undefined && initValue(newVal, "value");
   },
   {
     deep: true,
@@ -449,7 +447,7 @@ watch(
 watch(
   () => props.defaultValue,
   (newVal, oldVal) => {
-    initValue(newVal);
+    newVal !== undefined && initValue(newVal);
   },
   {
     deep: true,
@@ -459,7 +457,7 @@ watch(
 
 /* 把处理外部值单独拿出来，因为defaultValue和v-model:value都是这套逻辑 */
 function initValue(newVal, from = "defaultValue") {
-  let diff = diffProperty(newVal, formResult.value);
+  let diff = diffProperty(newVal || {}, formResult.value);
   let keys = Object.keys(diff);
   keys.forEach((key) => {
     let findItem = props.config?.columns.find((item) => item.propName === key);

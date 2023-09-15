@@ -92,7 +92,7 @@ const props = defineProps({
   },
   params: {
     type: Object,
-    default: {},
+    default: () => {},
   },
   token: {
     type: String,

@@ -65,11 +65,11 @@ const formId = ref("tree_" + getRandomId());
 const props = defineProps({
   value: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   treeData: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   dataKey: {
     type: String,

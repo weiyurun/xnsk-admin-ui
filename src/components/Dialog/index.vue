@@ -87,8 +87,7 @@
     </template>
   </n-modal>
 </template>
-<script>
-</script>
+<script></script>
 <script setup>
 import { useDialog, NModal, NButton } from "naive-ui";
 import {
@@ -125,7 +124,7 @@ const props = defineProps({
   },
   footBtns: {
     type: Array,
-    default: ["确定", "取消"],
+    default: () => ["确定", "取消"],
   },
   loading: {
     type: Boolean,
@@ -133,11 +132,11 @@ const props = defineProps({
   },
   callback: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   callbacks: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   //是否锁定
   lock: {

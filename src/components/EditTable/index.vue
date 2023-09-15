@@ -15,11 +15,11 @@ import { NButton, NInput, NSelect, NDataTable } from "naive-ui";
 const props = defineProps({
   value: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   config: {
     type: Object,
-    default: {},
+    default: () => {},
   },
 });
 const emits = defineEmits(["onUpdate"]);
