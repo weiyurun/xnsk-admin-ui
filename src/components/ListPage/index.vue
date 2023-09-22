@@ -142,6 +142,8 @@
           v-if="props?.config?.table?.title"
           :title="getTitle"
         />
+        <!-- 无标题时占位，保证按钮在右侧 -->
+        <span v-else></span>
         <p style="display: flex">
           <template
             v-for="(item, index) in props?.config?.table?.headBtns || []"
@@ -325,9 +327,9 @@ let pageData = ref({});
 function initParams() {
   if (searchItems.value.length) {
     searchItems.value.forEach((item) => {
-      if (item?.type === "input") {
+      if (item?.type === "input" || !item.type) {
         params.value[item.propName] =
-          item?.defaultValue?.xnsk_admin_ui_realValue || "";
+          item?.defaultValue?.xnsk_admin_ui_realValue ?? "";
       } else if (item?.type === "select") {
         params.value[item.propName] =
           item.defaultValue === "" || item.defaultValue === undefined

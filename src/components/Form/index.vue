@@ -129,6 +129,7 @@ defaultValue [Object] 默认值
               :options="getSelection(item)"
               :placeholder="getPlaceholder(item)"
               :disabled="item.disabled"
+              :multiple="item.multiple"
               :readonly="item.readonly"
               :label-field="item.selectionLabelKey"
               :value-field="item.selectionValueKey"
@@ -329,6 +330,9 @@ const getItems = computed(() => {
         obj.renderLabel = item.renderLabel;
         obj.renderOption = item.renderOption;
         obj.renderTag = item.renderTag;
+
+        //复选
+        obj.multiple = item.multiple || false; //默认单选
       }
       /* 处理树形选择 */
       if (

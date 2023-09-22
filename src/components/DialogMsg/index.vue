@@ -16,7 +16,7 @@
       {{ data }}
     </div>
     <template #footBtn>
-      <div class="text-center">
+      <div class="text-center" style="padding-top: 4px;">
         <n-button type="primary" @click="copyLog">
           <template #icon>
             <img
