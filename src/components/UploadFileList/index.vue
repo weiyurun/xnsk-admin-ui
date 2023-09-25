@@ -92,7 +92,7 @@ const props = defineProps({
   },
   params: {
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
   token: {
     type: String,
@@ -149,7 +149,7 @@ const customRequest = async ({ file, onFinish, onError }) => {
   formData.append("bucket", props.bucket);
   formData.append("pathPrefix", props.path);
   //扩展参数
-  let keys = Object.keys(props.params);
+  let keys = Object.keys(props.params) || [];
   keys.forEach((key) => {
     formData.append(key, props.params[key]);
   });
