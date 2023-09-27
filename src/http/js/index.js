@@ -5,7 +5,6 @@ const post = (axios_, config_, url = "", data = {}, extendsConfig = {}) => {
     if (config_.beforeRequest) {
       config_.beforeRequest(request, extendsConfig ?? {});
     }
-    console.log('request', request)
     return request;
   });
   return new Promise((resolve, reject) => {
