@@ -558,7 +558,7 @@ function getTableData(newParams = {}, callback = null) {
         } else {
           dataList.value = list_;
         }
-        pageData.value = res || {};
+        pageData.value = res?.data || {};
         pagination.value.itemCount = res.total || res.data.total;
         pagination.value.page = res.pageNum || res.data.pageNum || 1;
         emit("success", pageData.value);
@@ -714,17 +714,6 @@ onMounted(() => {
   tableWidth.value = tableColumns.value.reduce((a, b) => {
     return a + (b.minWidth || b.width || 0);
   }, 0);
-});
-//2023.10.7 缓存的列表页在组件内处理激活逻辑，省去使用时重复代码
-let firstActive = true;
-onActivated(() => {
-  if (!firstActive) {
-    //这块逻辑复制上面onMounted
-    let unLoad = props.config?.unLoad?.xnsk_admin_ui_realValue;
-    let loadData = props.config?.loadData?.xnsk_admin_ui_realValue;
-    !unLoad && loadData !== false && getTableData();
-  }
-  firstActive = false;
 });
 watchEffect(() => {
   if (props.config?.data?.xnsk_admin_ui_realType === "asyncfunction") {
