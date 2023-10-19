@@ -682,14 +682,45 @@ function getButtonLoading(_value) {
 
 /* 可勾选时，勾选更新 */
 const checkedKeys = ref([]);
-const checkedRows = ref([]);
+//保存历史数据，提供跨页勾选使用
+const historyCheckedData = ref([]);
 function handleCheckedRowKeys(keys, rows) {
-  checkedKeys.value = keys;
-  checkedRows.value = rows;
-  if (props.config?.onUpdateChecked?.xnsk_admin_ui_realType === "function") {
-    props.config.onUpdateChecked(keys);
+  /* 
+    此处的坑：keys在翻页后会保留，rows不会，所以需要手动存储选择时的数据
+    目前逻辑：1. 先将rows排重存储，保证如何翻页，已选数据不会丢失；2. 用keys筛选最终结果数据
+
+  */
+  let keyWord = "";
+  if (rows?.length > 0) {
+    keyWord =
+      props?.config?.selectionKey ??
+      rows[0]?.did ??
+      rows[0]?.id ??
+      rows[0]?.randomId ??
+      "did";
+    rows.forEach((rowData) => {
+      if (rowData) {
+        //查询历史数据是否已存在
+        let findItem = historyCheckedData.value.find(
+          (i) => i[keyWord] === rowData[keyWord],
+        );
+        //新选择的数据，保存源对象
+        if (!findItem) {
+          historyCheckedData.value.push(rowData);
+        }
+      }
+    });
+    //添加完后，再根据keys，筛选不需要的数据
+    historyCheckedData.value.filter((i) => keys.includes(i[keyWord]));
   } else {
-    emit("onUpdateChecked", keys);
+    historyCheckedData.value = [];
+  }
+
+  checkedKeys.value = keys;
+  if (props.config?.onUpdateChecked?.xnsk_admin_ui_realType === "function") {
+    props.config.onUpdateChecked(keys, historyCheckedData.value);
+  } else {
+    emit("onUpdateChecked", keys, historyCheckedData.value);
   }
 }
 /* 手动获取勾选数据 */
@@ -701,7 +732,7 @@ function getSelectValues(type = "value") {
   if (type === "value") {
     return unref(checkedKeys.value);
   } else if (type === "row") {
-    return unref(checkedRows.value);
+    return unref(historyCheckedData.value);
   }
 }
 onMounted(() => {
