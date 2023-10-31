@@ -226,10 +226,10 @@ defineExpose({
     display: none;
   }
 }
-:deep(.n-upload-file-list) {
-  margin-top: 0;
-  > div:first-child {
-    margin-top: 8px;
-  }
-}
+// :deep(.n-upload-file-list) {
+//   margin-top: 0;
+//   > div:first-child {
+//     margin-top: 8px;
+//   }
+// }
 </style>
