@@ -6,25 +6,21 @@
     />
 -->
 <template>
-  <XnskDialog
-    :title="title"
-    v-model:show="isShow"
-    width="800"
-    :callback="[]"
-  >
+  <XnskDialog :title="title" v-model:show="isShow" width="800" :callback="[]">
     <div class="break-all">
       {{ data }}
     </div>
     <template #footBtn>
-      <div class="text-center" style="padding-top: 4px;">
+      <div class="text-center" style="padding-top: 4px">
         <n-button type="primary" @click="copyLog">
           <template #icon>
             <img
               class="mt-px"
               src="../../assets/img/copy.png"
               style="width: 16px; height: 16px"
-            /> </template
-          >复制日志
+            />
+          </template>
+          {{ buttonText }}
         </n-button>
       </div>
     </template>
@@ -47,6 +43,10 @@ const props = defineProps({
   title: {
     type: String,
     default: "日志",
+  },
+  buttonText: {
+    type: String,
+    default: "复制日志",
   },
   data: {
     type: String,

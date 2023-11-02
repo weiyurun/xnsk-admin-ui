@@ -20,7 +20,7 @@
     width="600"
     height="auto"
     :footBtns="['确定', '取消']"
-    :callback="[submitHandler,cancelHandler]"
+    :callbacks="[submitHandler,cancelHandler]"
     @beforeClose="beforeClose"
   >
     /* 弹窗主体内容 */

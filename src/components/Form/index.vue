@@ -337,7 +337,7 @@ const getItems = computed(() => {
       /* 处理树形选择 */
       if (
         ["treeSelect", "select", "radio", "checkbox", "input-select"].includes(
-          obj?.type,
+          obj?.type
         )
       ) {
         obj.selectionLabelKey = item.selectionLabelKey || "label";
@@ -375,7 +375,7 @@ const getItems = computed(() => {
               if (obj?.checkByRegExp) {
                 if (!checkByRegExpHandler(value, obj?.checkByRegExp)) {
                   return new Error(
-                    `${errMsgPrefix[obj?.type]}正确的${obj.label}`,
+                    `${errMsgPrefix[obj?.type]}正确的${obj.label}`
                   );
                 }
               }
@@ -445,7 +445,7 @@ watch(
   {
     deep: true,
     immediate: true,
-  },
+  }
 );
 /* 监听默认值 */
 watch(
@@ -456,7 +456,7 @@ watch(
   {
     deep: true,
     immediate: true,
-  },
+  }
 );
 
 /* 把处理外部值单独拿出来，因为defaultValue和v-model:value都是这套逻辑 */
@@ -533,7 +533,7 @@ function changePropName(val, item) {
   if (item.clearByRegExp) {
     formResult.value[item.propName] = clearByRegExpHandler(
       formResult.value[item.propName],
-      item.clearByRegExp,
+      item.clearByRegExp
     );
   }
   if (item?.onInput?.xnsk_admin_ui_realType === "function") {
@@ -554,7 +554,7 @@ function changePropName(val, item) {
 //监听blur
 function inputBlur(val, item) {
   if (item?.onBlur?.xnsk_admin_ui_realType === "function") {
-    let res = item?.onBlur?.(val);
+    let res = item?.onBlur?.(val, item);
     if (res !== undefined) {
       formResult.value[item.propName] = res;
     }
@@ -662,7 +662,7 @@ function validate(fn, key) {
       },
       (rule) => {
         return keys.includes(rule?.key);
-      },
+      }
     );
   }
 }
