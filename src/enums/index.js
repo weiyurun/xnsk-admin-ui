@@ -1,3 +1,4 @@
+/* 枚举都在这里写，用数组方式 */
 const enums = {
   moduleType: [
     { label: "java", value: 1 },
