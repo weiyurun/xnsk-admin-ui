@@ -34,7 +34,7 @@
     >
       <span class="inline-block uploadBtn">
         <template v-if="attrs?.['list-type'] === 'image-card'">
-          <span style="font-size: 40px; line-height: 20px">+</span>
+          <span style="font-size: 40px;">+</span>
         </template>
         <slot v-else name="uploadBtn" :loading="loading"></slot>
       </span>

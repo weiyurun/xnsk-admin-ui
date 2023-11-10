@@ -58,7 +58,10 @@ defaultValue [Object] 默认值
           :offset="item.offset"
           :style="item?.style || null"
         >
-          <slot v-if="item.onlyUseSpace" :name="item.propName"></slot>
+          <slot
+            v-if="item.onlyUseSpace"
+            :name="item.propName || item.slotName"
+          ></slot>
           <n-form-item
             v-else
             :label="
@@ -194,9 +197,22 @@ defaultValue [Object] 默认值
                   : item.text
               }}
             </span>
+            <!-- 图片上传 -->
+            <XnskUploadFileList
+              v-if="item?.type === 'image'"
+              v-model:value="formResult[item.propName]"
+              accept=".png,.jpg,.jpeg"
+              list-type="image-card"
+              :max="item.maxlength ?? 1"
+              :token="item.token"
+              :bucket="item.bucket"
+              :path="item.path"
+            >
+            </XnskUploadFileList>
+            <!-- 2023.11.9 优化 ,slot类型以后用slotName，和propName分开-->
             <slot
               v-if="item?.type === 'slot'"
-              :name="item.propName"
+              :name="item.propName || item.slotName"
               :data="formResult"
               :item="item"
             ></slot>
@@ -217,7 +233,7 @@ defaultValue [Object] 默认值
 </template>
 
 <script setup>
-import { XnskFormBtns } from "../index";
+import { XnskFormBtns, XnskUploadFileList } from "../index";
 import {
   NForm,
   NFormItem,
@@ -306,6 +322,7 @@ const getItems = computed(() => {
       obj.type = item?.type;
       obj.useFormItem = item.useFormItem || false;
       obj.propName = item.propName;
+      obj.slotName = item.slotName;
       obj.required = item.required || false;
       obj.maxlength = item.maxlength || item.maxLength;
       obj.rows = item.rows || 9;
@@ -318,6 +335,15 @@ const getItems = computed(() => {
       obj.onBlur = item.onBlur || null;
       obj.clearable = item.clearable;
       obj.placeholder = item.placeholder;
+      obj.readonly = item.readonly;
+      obj.disabled = item.disabled;
+
+      /* 2023.11.9 添加图片上传功能 */
+      if (item?.type === "image") {
+        obj.token = item.token ?? localStorage.getItem("ACCESS-TOKEN");
+        obj.bucket = item.bucket ?? "xnsk-module";
+        obj.path = item.path ?? "module/img/";
+      }
 
       /* 输入框添加自动清空、自动校验 */
       if (["input"].includes(obj?.type)) {
@@ -397,23 +423,6 @@ const getItems = computed(() => {
         },
       };
       rules.value[obj.propName] = ruleObject;
-
-      /* 是否禁用 */
-      if (item.disabled !== undefined) {
-        let isDisabled =
-          item.disabled?.xnsk_admin_ui_realType === "function"
-            ? item.disabled()
-            : item.disabled;
-        isDisabled && (obj.disabled = true);
-      }
-      /* 是否只读 */
-      if (item.readonly !== undefined) {
-        let isReadonly =
-          item.readonly?.xnsk_admin_ui_realType === "function"
-            ? item.readonly()
-            : item.readonly;
-        isReadonly && (obj.readonly = true);
-      }
 
       /* 是否显示 */
       let isShow =

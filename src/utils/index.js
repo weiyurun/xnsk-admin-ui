@@ -201,3 +201,12 @@ export function diffProperty(obj1, obj2) {
   }
   return result;
 }
+
+export function splitString (data = "", delimiter = ",") {
+  let str = data || ""
+  if (str.length > 0) {
+    return str.split(delimiter)
+  } else {
+    return []
+  }
+}

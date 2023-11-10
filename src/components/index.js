@@ -13,3 +13,6 @@ export { XnskTreeSync } from "./TreeSync";
 export { XnskUploadFileList } from "./UploadFileList";
 export { XnskEditTable } from "./EditTable";
 export { XnskErrorIcon } from "./ErrorIcon";
+
+/* 业务组件 */
+export { XnskModuleList } from "./moduleList";

@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       vue: path.resolve("./node_modules/vue"),
     },
+    dedupe: ["vue"],
   },
   build: {
     target: "es2015",
