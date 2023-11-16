@@ -413,7 +413,7 @@ function initTableColumns() {
                 {
                   src: item.icon,
                 },
-                { default: () => "" },
+                { default: () => "" }
               );
             } else if (_iconType === "[object Object]") {
               //组件icon
@@ -470,11 +470,11 @@ function initTableColumns() {
                         },
                         {
                           default: () => item.label,
-                        },
+                        }
                       ),
                     ],
-                  },
-                ),
+                  }
+                )
               );
           });
         }
@@ -485,7 +485,7 @@ function initTableColumns() {
           },
           {
             default: () => [...btns],
-          },
+          }
         );
       };
     }
@@ -647,7 +647,7 @@ async function searchReset() {
 
 /* 表格头部按钮是否显示 */
 function getHeadBtnShow(item) {
-  if (!item?.show) {
+  if (item?.show === undefined) {
     return true;
   } else {
     if (item.show?.xnsk_admin_ui_realType === "function") {
@@ -702,7 +702,7 @@ function handleCheckedRowKeys(keys, rows) {
       if (rowData) {
         //查询历史数据是否已存在
         let findItem = historyCheckedData.value.find(
-          (i) => i[keyWord] === rowData[keyWord],
+          (i) => i[keyWord] === rowData[keyWord]
         );
         //新选择的数据，保存源对象
         if (!findItem) {
@@ -759,7 +759,7 @@ watch(
   () => props.loading,
   () => {
     loading.value = props.loading;
-  },
+  }
 );
 defineExpose({
   getTableData,
