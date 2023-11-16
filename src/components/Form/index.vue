@@ -73,6 +73,7 @@ defaultValue [Object] 默认值
             <n-input
               v-trim
               v-if="item?.type === 'input'"
+              :class="{ 'form-readonly': item.readonly }"
               v-model:value="formResult[item.propName]"
               :placeholder="getPlaceholder(item)"
               :maxlength="item.maxlength || 20"
@@ -81,6 +82,7 @@ defaultValue [Object] 默认值
               clearable
               @blur="(e) => inputBlur(formResult[item.propName], item)"
               @update:value="(e) => changePropName(e, item)"
+              :style="getInputStyle(item)"
             />
             <!-- 可输入，可选择 -->
             <n-select
@@ -335,8 +337,8 @@ const getItems = computed(() => {
       obj.onBlur = item.onBlur || null;
       obj.clearable = item.clearable;
       obj.placeholder = item.placeholder;
-      obj.readonly = item.readonly;
-      obj.disabled = item.disabled;
+      obj.readonly = item?.readonly?.xnsk_admin_ui_realValue;
+      obj.disabled = item?.disabled?.xnsk_admin_ui_realValue;
 
       /* 2023.11.9 添加图片上传功能 */
       if (item?.type === "image") {
@@ -545,6 +547,9 @@ function changePropName(val, item) {
       item.clearByRegExp
     );
   }
+  //2023.9.1 添加双向绑定
+  emit("update:value", unref(formResult.value));
+  // 如果表单项有单独监听
   if (item?.onInput?.xnsk_admin_ui_realType === "function") {
     let res = item?.onInput?.(val, item);
     if (res !== undefined) {
@@ -557,8 +562,6 @@ function changePropName(val, item) {
   } else {
     emit("change", unref(formResult.value), item, val);
   }
-  //2023.9.1 添加双向绑定
-  emit("update:value", unref(formResult.value));
 }
 //监听blur
 function inputBlur(val, item) {
@@ -625,39 +628,63 @@ function checkByRegExpName(val, name) {
       return numberReg.test(val);
   }
 }
+/* 处理样式 */
+function getInputStyle(item) {
+  if (item.readonly) {
+    return {
+      "--n-border": 0,
+      "--n-border-hover": 0,
+      "--n-border-focus": 0,
+      "--n-padding-left": 0,
+      "--n-padding-right": 0,
+      "--n-box-shadow-focus": 0,
+    };
+  } else {
+    return {};
+  }
+}
 
 /* 点击提交 */
 function submitClick() {
+  let fn = props.config?.submitBtn?.customValidate;
+  if (fn?.xnsk_admin_ui_realType === "function") {
+    fn(unref(formResult.value), confirm);
+    return;
+  }
   formId.value?.validate((errors) => {
     if (!errors) {
-      if (props.config?.submitBtn?.click) {
-        $dialog.warning({
-          title: "确定提交？",
-          content: "",
-          positiveText: "确定",
-          negativeText: "取消",
-          onPositiveClick: () => {
-            props.config?.submitBtn?.click(unref(formResult.value));
-          },
-          onNegativeClick: () => {},
-        });
-      } else {
-        $dialog.warning({
-          title: "确定提交？",
-          content: "",
-          positiveText: "确定",
-          negativeText: "取消",
-          onPositiveClick: () => {
-            emit("submit", unref(formResult.value));
-          },
-          onNegativeClick: () => {},
-        });
-      }
+      confirm();
     } else {
       /* 不通过 */
       message.error("请检查必填项");
     }
   });
+}
+/* 弹窗确认 */
+function confirm() {
+  if (props.config?.submitBtn?.click) {
+    $dialog.warning({
+      title: "确定提交？",
+      content: "",
+      positiveText: "确定",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        props.config?.submitBtn?.click(unref(formResult.value));
+      },
+      onNegativeClick: () => {},
+    });
+  } else {
+    $dialog.warning({
+      title: "确定提交？",
+      content: "",
+      positiveText: "确定",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        emit("submit", unref(formResult.value));
+      },
+      onNegativeClick: () => {},
+    });
+  }
 }
 /* 外部使用，校验方法 */
 function validate(fn, key) {
