@@ -739,9 +739,9 @@ defineExpose({
     display: none;
   }
 }
-// :deep(.n-form-item) {
-//   .n-form-item-label {
-//     line-height: inherit;
-//   }
-// }
+:deep(.n-form-item) {
+  .n-form-item-label {
+    line-height: inherit;
+  }
+}
 </style>
