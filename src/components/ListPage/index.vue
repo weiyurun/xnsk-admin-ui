@@ -504,6 +504,9 @@ function initTableColumns() {
       renderExpand: props?.config?.expand,
     });
   }
+  tableWidth.value = tableColumns.value.reduce((a, b) => {
+    return a + (b.minWidth || b.width || 0);
+  }, 0);
 }
 /* 获取下拉项 */
 function getSelection(_arr = []) {
@@ -746,9 +749,6 @@ onMounted(() => {
   let unLoad = props.config?.unLoad?.xnsk_admin_ui_realValue;
   let loadData = props.config?.loadData?.xnsk_admin_ui_realValue;
   !unLoad && loadData !== false && getTableData();
-  tableWidth.value = tableColumns.value.reduce((a, b) => {
-    return a + (b.minWidth || b.width || 0);
-  }, 0);
 });
 watchEffect(() => {
   if (props.config?.data?.xnsk_admin_ui_realType === "asyncfunction") {
