@@ -34,7 +34,7 @@
     >
       <span class="inline-block uploadBtn">
         <template v-if="attrs?.['list-type'] === 'image-card'">
-          <span style="font-size: 40px;">+</span>
+          <span style="font-size: 40px">+</span>
         </template>
         <slot v-else name="uploadBtn" :loading="loading"></slot>
       </span>
@@ -51,7 +51,7 @@ const attrs = useAttrs();
 /* 上传地址 */
 /* 随机数ID，为同时加载多个上传组件准备 , 后期换成 uuid*/
 const refId = ref(
-  "ref" + new Date().getTime() + parseInt(Math.random() * 10000),
+  "ref" + new Date().getTime() + parseInt(Math.random() * 10000)
 );
 /* loading */
 let loading = ref(false);
@@ -60,6 +60,10 @@ const props = defineProps({
   value: {
     type: String,
     default: "",
+  },
+  fileList: {
+    type: String,
+    default: () => [],
   },
   /* 是否显示文件列表 */
   showFileList: {
@@ -96,11 +100,15 @@ const props = defineProps({
   },
   token: {
     type: String,
-    default: "",
+    default: null,
   },
   triggerShow: {
     type: Boolean,
     default: true,
+  },
+  maxlength: {
+    type: [Number, null],
+    defualt: null,
   },
 });
 /* 定义事件 */
@@ -139,7 +147,7 @@ watch(
       });
     }
   },
-  { deep: true, immediate: true },
+  { deep: true, immediate: true }
 );
 
 /* 自定义上传 */
@@ -155,7 +163,7 @@ const customRequest = async ({ file, onFinish, onError }) => {
   });
   loading.value = true;
   let res = await http(props.url, {
-    token: props.token,
+    token: props.token ?? localStorage.getItem("ACCESS-TOKEN"),
   })(formData);
   loading.value = false;
   if (res?.status === 200) {
@@ -175,7 +183,7 @@ async function beforeUpload(file) {
   //判断格式
   if (
     attrs?.accept?.indexOf(
-      getSuffixName(file.file.name?.toLowerCase(), "."),
+      getSuffixName(file.file.name?.toLowerCase(), ".")
     ) === -1
   ) {
     $message.error("格式不正确");

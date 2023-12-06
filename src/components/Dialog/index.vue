@@ -1,50 +1,4 @@
-<!--
-  弹窗模板 
-  v-model:show 是否显示
-  title 标题（如果不传，头部左侧蓝色竖条也不显示）
-  width 宽
-  height 高 （默认auto，如果内容太多需要需要滚动条，请设置具体高度）
-  footBtns 底部按钮（默认确定+取消，不需要按钮时传空数组），默认第一个按钮实心，第二个空心。特殊情况直接使用#footBtn的slot自定义
-  callback 按钮点击事件（参数function,和footBtns顺序一一对应） 
-  loading 提交按钮的loading
-  @beforeClose 关闭拦截 参数：function，执行该function即执行关闭。不监听则点击取消或叉号直接关闭
-  lock 是否锁定？默认为true，不支持点击蒙层和ESC关闭
-  其他参数参考n-modal（部分参数已固定，不支持定制，如：preset、close-on-esc、mask-closable、trap-focus）
-
-  ……其他参数/功能持续维护
-
-  样例：
-  <xnsk-dialog
-    title="标题"
-    v-model:show="true"
-    width="600"
-    height="auto"
-    :footBtns="['确定', '取消']"
-    :callbacks="[submitHandler,cancelHandler]"
-    @beforeClose="beforeClose"
-  >
-    /* 弹窗主体内容 */
-  </xnsk-dialog>
-<script setup>
-  import { useDialog } from 'naive-ui'
-  const dialog = useDialog()
-  /* 关闭拦截 */
-  function beforeClose(done){
-      dialog.warning({
-          title: '警告',
-          content: '确定关闭？',
-          positiveText: '确定',
-          negativeText: '取消',
-          onPositiveClick: () => {
-            done()
-          },
-          onNegativeClick: () => {
-          }
-        })
-  }
-</script>
- 
--->
+<!-- 弹窗 -->
 <template>
   <n-modal
     v-model:show="isShow"
@@ -66,22 +20,23 @@
     </template>
     <template #footer>
       <slot v-if="slot.footBtn" name="footBtn"></slot>
+      <slot v-else-if="slot.btns" name="btns"></slot>
       <div v-else class="dialog-templete-btns">
         <n-button
-          v-if="footBtns.length > 0"
+          v-if="_btns.length > 0"
           type="info"
           :loading="loading"
           @click="submitClick"
         >
-          {{ footBtns[0] }}
+          {{ _btns[0] }}
         </n-button>
         <n-button
-          v-if="footBtns.length > 1"
+          v-if="_btns.length > 1"
           type="info"
           ghost
           @click="cancelClick"
         >
-          {{ footBtns[1] }}
+          {{ _btns[1] }}
         </n-button>
       </div>
     </template>
@@ -126,6 +81,11 @@ const props = defineProps({
     type: Array,
     default: () => ["确定", "取消"],
   },
+  //以后用btns
+  btns: {
+    type: Array,
+    default: () => ["确定", "取消"],
+  },
   loading: {
     type: Boolean,
     default: false,
@@ -144,6 +104,12 @@ const props = defineProps({
     defualt: false,
   },
 });
+
+//按钮数组
+const _btns = computed(() => {
+  return props.btns?.length > 0 ? props.btns : props.footBtns;
+});
+
 const callback = props.callbacks?.length > 0 ? props.callbacks : props.callback;
 /* 是否显示弹窗 */
 let isShow = computed({

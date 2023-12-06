@@ -89,7 +89,7 @@
                 :placeholder="item.placeholder || '请输入' + item.label"
                 clearable
                 :disabled="item.disabled === true || false"
-                :maxlength="item.maxlength || 20"
+                :maxlength="item.maxlength || 200"
                 @update:value="paramsChange(item)"
                 @keyup.enter="searchClick"
               >
@@ -343,84 +343,88 @@ function initParams() {
 /* 初始化列 */
 function initTableColumns() {
   let _columns = props?.config?.table?.columns || [];
-  tableColumns.value = _columns.map((item, index) => {
-    let obj = {
-      ellipsis: !item.unEllipsis
-        ? {
-            tooltip: true,
-          }
-        : false,
-      align:
-        props?.config?.isTree && index === 0 ? "left" : item.align || "center",
-      titleAlign: "center",
-      /* ...item, */
-    };
-    /* 自定义内容，支持String和slot */
-    if (item.customValue) {
-      obj.render = (row) => {
-        return item.customValue(row);
+  tableColumns.value = _columns
+    .filter((i) => i)
+    .map((item, index) => {
+      let obj = {
+        ellipsis: !item.unEllipsis
+          ? {
+              tooltip: true,
+            }
+          : false,
+        align:
+          props?.config?.isTree && index === 0
+            ? "left"
+            : item.align || "center",
+        titleAlign: "center",
+        /* ...item, */
       };
-    } else if (item.slot) {
-      obj.render = (row) => {
-        return h(slots[item.slot], row);
-      };
-    } else {
-      obj.render = (row) => {
-        return row[item.key] === null ||
-          row[item.key] === undefined ||
-          row[item.key] === ""
-          ? "—"
-          : row[item.key];
-      };
-    }
-    /* 2023.8.9 更新：宽度支持传入函数，以便动态更改（限首次渲染），场景：不同角色/业务展示的宽度不同，但不支持按表格数据动态更改 */
-    item.width = item.width?.xnsk_admin_ui_realValue;
-    item.minWidth = item.minWidth?.xnsk_admin_ui_realValue;
+      /* 自定义内容，支持String和slot */
+      if (item.customValue) {
+        obj.render = (row) => {
+          return item.customValue(row);
+        };
+      } else if (item.slot) {
+        obj.render = (row) => {
+          return h(slots[item.slot], row);
+        };
+      } else {
+        obj.render = (row) => {
+          return row[item.key] === null ||
+            row[item.key] === undefined ||
+            row[item.key] === ""
+            ? "—"
+            : row[item.key];
+        };
+      }
+      /* 2023.8.9 更新：宽度支持传入函数，以便动态更改（限首次渲染），场景：不同角色/业务展示的宽度不同，但不支持按表格数据动态更改 */
+      item.width = item.width?.xnsk_admin_ui_realValue;
+      item.minWidth = item.minWidth?.xnsk_admin_ui_realValue;
 
-    /* 2023.8.2 更新，去除了以前的对于width和minWidth的处理，因为暂时没有完美方案，先用组件自带的方案处理 */
-    /* 理想中的方案：设置width表示此列固定宽，无需均分；minWidth表示此列最小值，有溢出空间则参与均分，
+      /* 2023.8.2 更新，去除了以前的对于width和minWidth的处理，因为暂时没有完美方案，先用组件自带的方案处理 */
+      /* 理想中的方案：设置width表示此列固定宽，无需均分；minWidth表示此列最小值，有溢出空间则参与均分，
     目前组件自带方案有问题，当有多列设置了minWidth，它们被强行均分了（不知道是故意还是bug） */
-    if (item?.type !== "selection") {
-    }
+      if (item?.type !== "selection") {
+      }
 
-    /* 操作栏统一固定右侧 */
-    if (item.key === "actions") {
-      obj.fixed = "right";
-      obj.render = (row) => {
-        let btns = [];
-        if (props?.config?.table?.actions?.length > 0) {
-          props.config.table.actions.forEach((item) => {
-            /* 判断是否显示、禁用 */
-            let _show, _disabled;
-            if (item.show?.xnsk_admin_ui_realType === "function") {
-              _show = item.show(row);
-            } else {
-              _show = item.show;
-            }
-            if (item.disabled?.xnsk_admin_ui_realType === "function") {
-              _disabled = item.disabled(row);
-            } else {
-              _disabled = item.disabled ?? false;
-            }
+      /* 操作栏统一固定右侧 */
+      if (item.key === "actions") {
+        obj.fixed = "right";
+        obj.render = (row) => {
+          let btns = [];
+          if (props?.config?.table?.actions?.length > 0) {
+            props.config.table.actions.forEach((item) => {
+              /* 判断是否显示、禁用 */
+              let _show, _disabled;
+              if (item.show?.xnsk_admin_ui_realType === "function") {
+                _show = item.show(row);
+              } else {
+                _show = item.show;
+              }
+              if (item.disabled?.xnsk_admin_ui_realType === "function") {
+                _disabled = item.disabled(row);
+              } else {
+                _disabled = item.disabled ?? false;
+              }
 
-            /* 生成按钮 */
-            let _icon;
-            let _iconType = Object.prototype.toString.call(item.icon);
-            if (_iconType === "[object String]") {
-              //图片icon
-              _icon = h(
-                "img",
-                {
-                  src: item.icon,
-                },
-                { default: () => "" }
-              );
-            } else if (_iconType === "[object Object]") {
-              //组件icon
-              _icon = item.icon;
-            }
-            /* 判断loading */
-            /*  let _loading;
+              /* 生成按钮 */
+              let _icon;
+              let _iconType = Object.prototype.toString.call(item.icon);
+              if (_iconType === "[object String]") {
+                //图片icon
+                _icon = h(
+                  "img",
+                  {
+                    src: item.icon,
+                  },
+                  { default: () => "" }
+                );
+              } else if (_iconType === "[object Object]") {
+                //组件icon
+                _icon = item.icon;
+              }
+              /* 判断loading */
+              /*  let _loading;
             if (
               Object.prototype.toString.call(item.loading) ===
               "[object Function]"
@@ -429,68 +433,68 @@ function initTableColumns() {
             } else {
               _loading = unref(item.loading);
             } */
-            (_show || _show === undefined) &&
-              btns.push(
-                h(
-                  NButton,
-                  {
-                    size: "small",
-                    /* loading: _loading, */
-                    quaternary: true,
-                    type: item?.type || "primary",
-                    disabled: _disabled,
-                    onClick: () => {
-                      if (item?.autoWarn) {
-                        dialog.warning({
-                          title: `确定${item.label}`,
-                          content: "",
-                          positiveText: "确定",
-                          negativeText: "取消",
-                          onPositiveClick: () => {
-                            item.click(row) || null;
-                          },
-                          onNegativeClick: () => {},
-                        });
-                      } else {
-                        item.click(row) || null;
-                      }
-                    },
-                    style: "--n-opacity-disabled: 0;",
-                  },
-                  {
-                    default: () => [
-                      _icon &&
-                        h(NIcon, {
-                          component: _icon,
-                        }),
-                      h(
-                        "div",
-                        {
-                          style: `margin-left:${_icon ? 5 : 0}px;`,
-                        },
-                        {
-                          default: () => item.label,
+              (_show || _show === undefined) &&
+                btns.push(
+                  h(
+                    NButton,
+                    {
+                      size: "small",
+                      /* loading: _loading, */
+                      quaternary: true,
+                      type: item?.type || "primary",
+                      disabled: _disabled,
+                      onClick: () => {
+                        if (item?.autoWarn) {
+                          dialog.warning({
+                            title: `确定${item.label}`,
+                            content: "",
+                            positiveText: "确定",
+                            negativeText: "取消",
+                            onPositiveClick: () => {
+                              item.click(row) || null;
+                            },
+                            onNegativeClick: () => {},
+                          });
+                        } else {
+                          item.click(row) || null;
                         }
-                      ),
-                    ],
-                  }
-                )
-              );
-          });
-        }
-        return h(
-          "div",
-          {
-            class: "flex",
-          },
-          {
-            default: () => [...btns],
+                      },
+                      style: "--n-opacity-disabled: 0;",
+                    },
+                    {
+                      default: () => [
+                        _icon &&
+                          h(NIcon, {
+                            component: _icon,
+                          }),
+                        h(
+                          "div",
+                          {
+                            style: `margin-left:${_icon ? 5 : 0}px;`,
+                          },
+                          {
+                            default: () => item.label,
+                          }
+                        ),
+                      ],
+                    }
+                  )
+                );
+            });
           }
-        );
-      };
-    }
-    return { ...item, ...obj };
-  });
+          return h(
+            "div",
+            {
+              class: "flex",
+            },
+            {
+              default: () => [...btns],
+            }
+          );
+        };
+      }
+      return { ...item, ...obj };
+    });
   /* 行是否可展开 */
   if (props?.config?.expand) {
     tableColumns.value.unshift({
@@ -685,7 +689,7 @@ const checkedKeys = ref([]);
 //保存历史数据，提供跨页勾选使用
 const historyCheckedData = ref([]);
 function handleCheckedRowKeys(keys, rows) {
-  /* 
+  /*
     此处的坑：keys在翻页后会保留，rows不会，所以需要手动存储选择时的数据
     目前逻辑：1. 先将rows排重存储，保证如何翻页，已选数据不会丢失；2. 用keys筛选最终结果数据
 
@@ -737,7 +741,7 @@ function getSelectValues(type = "value") {
 }
 onMounted(() => {
   initParams();
-  initTableColumns();
+  // initTableColumns();
   //优化：unload原意是不加载数据。改为：loadData，默认自动加载；设为false，表示关闭
   let unLoad = props.config?.unLoad?.xnsk_admin_ui_realValue;
   let loadData = props.config?.loadData?.xnsk_admin_ui_realValue;
@@ -759,6 +763,17 @@ watch(
   () => props.loading,
   () => {
     loading.value = props.loading;
+  }
+);
+/* 监听列参数变化 */
+watch(
+  () => props?.config?.table?.columns,
+  () => {
+    initTableColumns();
+  },
+  {
+    deep: true,
+    immediate: true,
   }
 );
 defineExpose({

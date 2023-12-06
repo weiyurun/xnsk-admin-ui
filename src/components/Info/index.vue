@@ -34,7 +34,7 @@
         :key="item?.did || index"
         :span="item.span ?? 8"
       >
-        <!-- laben -->
+        <!-- label -->
         <template v-if="item.labelSlot">
           <slot :name="item.labelSlot"></slot>
         </template>
@@ -46,7 +46,7 @@
             'text-align': config.labelAlign ?? 'left',
           }"
         >
-          {{ item.label }}{{ config?.useColon ? ":" : "" }}
+          {{ item.label }}{{ config?.useColon ? ":" : "" }} 
         </span>
         <!-- 值 -->
         <template v-if="item.slot">

@@ -7,7 +7,7 @@
 -->
 <template>
   <XnskDialog :title="title" v-model:show="isShow" width="800" :callback="[]">
-    <div class="break-all">
+    <div class="break-all whitespace-pre">
       {{ data }}
     </div>
     <template #footBtn>
