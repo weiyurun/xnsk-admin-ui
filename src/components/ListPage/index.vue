@@ -718,7 +718,9 @@ function handleCheckedRowKeys(keys, rows) {
       }
     });
     //添加完后，再根据keys，筛选不需要的数据
-    historyCheckedData.value.filter((i) => keys.includes(i[keyWord]));
+    historyCheckedData.value = historyCheckedData.value.filter((i) =>
+      keys.includes(i[keyWord])
+    );
   } else {
     historyCheckedData.value = [];
   }
