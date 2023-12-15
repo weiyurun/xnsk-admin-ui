@@ -107,7 +107,11 @@ const props = defineProps({
 
 //按钮数组
 const _btns = computed(() => {
-  return props.btns?.length > 0 ? props.btns : props.footBtns;
+  if (props.btns === undefined && props.footBtns === undefined) {
+    return props.btns;
+  } else {
+    return props.btns ?? props.footBtns;
+  }
 });
 
 const callback = props.callbacks?.length > 0 ? props.callbacks : props.callback;
