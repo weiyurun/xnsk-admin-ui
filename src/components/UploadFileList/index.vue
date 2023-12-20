@@ -124,14 +124,15 @@ const localFileList = ref([]);
 watch(
   () => props.value,
   (newData) => {
-    if (newData === null || newData === undefined) {
+    /*  if (newData === null || newData === undefined) {
       emit("update:value", "");
-    }
+    } */
     if ([null, undefined, ""].includes(newData)) {
       localFileList.value.splice(0);
       return;
     }
     if (newData?.length > 0) {
+      localFileList.value.splice(0);
       let list = newData.split(",");
       list.forEach((url) => {
         let find_ = localFileList.value.find((file) => {

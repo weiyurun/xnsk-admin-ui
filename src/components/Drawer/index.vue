@@ -43,7 +43,7 @@ function maskClick() {
       content: "",
       positiveText: "确定",
       negativeText: "取消",
-      style: "z-index:999999",
+      style: "z-index:999999;",
       onPositiveClick: () => {
         emits("update:show", false);
       },
