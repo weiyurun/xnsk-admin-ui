@@ -282,6 +282,7 @@ const errMsgPrefix = {
   radio: "请选择",
   checkbox: "请选择",
   slot: "缺少",
+  image: "请上传",
 };
 const formId = ref("from_" + getRandomId());
 

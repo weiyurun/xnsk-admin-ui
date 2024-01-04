@@ -46,6 +46,6 @@ const fontSize = computed(() => {
 
 <style lang="scss" scoped>
 .blue-bar {
-  background-color: rgba(37, 127, 247, 1);
+  background-color: #257ff7;
 }
 </style>

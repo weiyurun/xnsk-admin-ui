@@ -223,7 +223,17 @@
       :on-update:page="pageChange"
       show-size-picker
       show-quick-jumper
-    />
+    >
+      <template #prefix>
+        <span
+          v-if="tableColumns.find((i) => i.type === 'selection')"
+          style="position: absolute; left: 2px"
+        >
+          已选 {{ checkedKeys.length }}
+        </span>
+        <span> 总计 {{ pagination.itemCount }} </span>
+      </template>
+    </n-pagination>
   </div>
 </template>
 
