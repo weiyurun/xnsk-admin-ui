@@ -50,176 +50,177 @@ defaultValue [Object] 默认值
       require-mark-placement="right"
     >
       <n-grid x-gap="12" :cols="24" item-responsive responsive="screen">
-        <n-gi
-          v-for="item in getItems"
-          :class="{ 'is-slot': item?.type === 'slot' && !item.useFormItem }"
-          :key="item.propName"
-          :span="item.span"
-          :offset="item.offset"
-          :style="item?.style || null"
-        >
-          <slot
-            v-if="item.onlyUseSpace"
-            :name="item.propName || item.slotName"
-          ></slot>
-          <n-form-item
-            v-else
-            :label="
-              item?.type === 'slot' && !item.useFormItem ? null : item.label
-            "
-            :path="item.propName"
+        <template v-for="item in getItems" :key="item.propName">
+          <n-gi
+            v-if="item.type"
+            :class="{ 'is-slot': item?.type === 'slot' && !item.useFormItem }"
+            :span="item.span"
+            :offset="item.offset"
+            :style="item?.style || null"
           >
-            <!-- 单行输入框 -->
-            <n-input
-              v-trim
-              v-if="item?.type === 'input'"
-              :class="{ 'form-readonly': item.readonly }"
-              v-model:value="formResult[item.propName]"
-              :placeholder="getPlaceholder(item)"
-              :maxlength="item.maxlength || 20"
-              :disabled="item.disabled"
-              :readonly="item.readonly"
-              clearable
-              @blur="(e) => inputBlur(formResult[item.propName], item)"
-              @update:value="(e) => changePropName(e, item)"
-              :style="getInputStyle(item)"
-            />
-            <!-- 可输入，可选择 -->
-            <n-select
-              v-if="item?.type === 'input-select'"
-              class="input-select-select"
-              :value="formResult[item.propName]"
-              :options="getSelection(item)"
-              :placeholder="getPlaceholder(item)"
-              :disabled="item.disabled"
-              :readonly="item.readonly"
-              :label-field="item.selectionLabelKey"
-              :value-field="item.selectionValueKey"
-              :children-field="item.selectionChildrenKey"
-              show-on-focus
-              filterable
-              :clearable="item.clearable !== false"
-              tag
-              :ignore-composition="false"
-              @input="
-                (e) => {
-                  formResult[item.propName] = e.target.value;
-                }
-              "
-              @update:value="
-                (e) => {
-                  formResult[item.propName] = e;
-                }
-              "
-            />
-            <!-- 多行输入 -->
-            <n-input
-              v-trim
-              v-if="item?.type === 'textarea'"
-              v-model:value="formResult[item.propName]"
-              type="textarea"
-              :placeholder="getPlaceholder(item)"
-              :maxlength="item.maxlength || 200"
-              :rows="item.rows || 9"
-              show-count
-              :disabled="item.disabled"
-              :readonly="item.readonly"
-              clearable
-              @update:value="(e) => changePropName(e, item)"
-            />
-            <!-- 选择框 -->
-            <n-select
-              v-if="item?.type === 'select'"
-              v-model:value="formResult[item.propName]"
-              :options="getSelection(item)"
-              :placeholder="getPlaceholder(item)"
-              :disabled="item.disabled"
-              :multiple="item.multiple"
-              :readonly="item.readonly"
-              :label-field="item.selectionLabelKey"
-              :value-field="item.selectionValueKey"
-              :children-field="item.selectionChildrenKey"
-              :clearable="item.clearable !== false"
-              :render-label="item.renderLabel"
-              :render-option="item.renderOption"
-              :render-tag="item.renderTag"
-              @update:value="(e) => changePropName(e, item)"
-            />
-            <!-- 树形选择框 -->
-            <n-tree-select
-              v-if="item?.type === 'treeSelect'"
-              v-model:value="formResult[item.propName]"
-              :options="getSelection(item)"
-              :disabled="item.disabled"
-              :readonly="item.readonly"
-              :label-field="item.selectionLabelKey"
-              :key-field="item.selectionValueKey"
-              :children-field="item.selectionChildrenKey"
-              :clearable="item.clearable !== false"
-              @update:value="(e) => changePropName(e, item)"
-            />
-            <!-- 单选框 -->
-            <n-radio-group
-              v-if="item?.type === 'radio'"
-              v-model:value="formResult[item.propName]"
-              @update:value="(e) => changePropName(e, item)"
-              :name="item.propName"
-              :disabled="item.disabled"
-              :readonly="item.readonly"
-            >
-              <n-space>
-                <n-radio
-                  v-for="selectionItem in getSelection(item)"
-                  :key="selectionItem[item.selectionValueKey]"
-                  :value="selectionItem[item.selectionValueKey]"
-                >
-                  {{ selectionItem[item.selectionLabelKey] }}
-                </n-radio>
-              </n-space>
-            </n-radio-group>
-            <!-- 复选框 -->
-            <n-checkbox-group
-              v-if="item?.type === 'checkbox'"
-              v-model:value="formResult[item.propName]"
-            >
-              <n-space item-style="display: flex;">
-                <n-checkbox
-                  v-for="selectionItem in getSelection(item)"
-                  :key="selectionItem[item.selectionValueKey]"
-                  :value="selectionItem[item.selectionValueKey]"
-                  :label="selectionItem[item.selectionLabelKey]"
-                />
-              </n-space>
-            </n-checkbox-group>
-            <!-- 提示文字 -->
-            <span v-if="item?.type === 'text'" :style="item.style">
-              {{
-                item.text?.xnsk_admin_ui_realType === "function"
-                  ? item.text()
-                  : item.text
-              }}
-            </span>
-            <!-- 图片上传 -->
-            <XnskUploadFileList
-              v-if="item?.type === 'image'"
-              v-model:value="formResult[item.propName]"
-              accept=".png,.jpg,.jpeg"
-              list-type="image-card"
-              :max="item.maxlength ?? 1"
-              :token="item.token"
-              :bucket="item.bucket"
-              :path="item.path"
-            >
-            </XnskUploadFileList>
-            <!-- 2023.11.9 优化 ,slot类型以后用slotName，和propName分开-->
             <slot
-              v-if="item?.type === 'slot'"
+              v-if="item.onlyUseSpace"
               :name="item.propName || item.slotName"
-              :data="formResult"
-              :item="item"
             ></slot>
-          </n-form-item>
-        </n-gi>
+            <n-form-item
+              v-else
+              :label="
+                item?.type === 'slot' && !item.useFormItem ? null : item.label
+              "
+              :path="item.propName"
+            >
+              <!-- 单行输入框 -->
+              <n-input
+                v-trim
+                v-if="item?.type === 'input'"
+                :class="{ 'form-readonly': item.readonly }"
+                v-model:value="formResult[item.propName]"
+                :placeholder="getPlaceholder(item)"
+                :maxlength="item.maxlength || 20"
+                :disabled="item.disabled"
+                :readonly="item.readonly"
+                clearable
+                @blur="(e) => inputBlur(formResult[item.propName], item)"
+                @update:value="(e) => changePropName(e, item)"
+                :style="getInputStyle(item)"
+              />
+              <!-- 可输入，可选择 -->
+              <n-select
+                v-if="item?.type === 'input-select'"
+                class="input-select-select"
+                :value="formResult[item.propName]"
+                :options="getSelection(item)"
+                :placeholder="getPlaceholder(item)"
+                :disabled="item.disabled"
+                :readonly="item.readonly"
+                :label-field="item.selectionLabelKey"
+                :value-field="item.selectionValueKey"
+                :children-field="item.selectionChildrenKey"
+                show-on-focus
+                filterable
+                :clearable="item.clearable !== false"
+                tag
+                :ignore-composition="false"
+                @input="
+                  (e) => {
+                    formResult[item.propName] = e.target.value;
+                  }
+                "
+                @update:value="
+                  (e) => {
+                    formResult[item.propName] = e;
+                  }
+                "
+              />
+              <!-- 多行输入 -->
+              <n-input
+                v-trim
+                v-if="item?.type === 'textarea'"
+                v-model:value="formResult[item.propName]"
+                type="textarea"
+                :placeholder="getPlaceholder(item)"
+                :maxlength="item.maxlength || 200"
+                :rows="item.rows || 9"
+                show-count
+                :disabled="item.disabled"
+                :readonly="item.readonly"
+                clearable
+                @update:value="(e) => changePropName(e, item)"
+              />
+              <!-- 选择框 -->
+              <n-select
+                v-if="item?.type === 'select'"
+                v-model:value="formResult[item.propName]"
+                :options="getSelection(item)"
+                :placeholder="getPlaceholder(item)"
+                :disabled="item.disabled"
+                :multiple="item.multiple"
+                :readonly="item.readonly"
+                :label-field="item.selectionLabelKey"
+                :value-field="item.selectionValueKey"
+                :children-field="item.selectionChildrenKey"
+                :clearable="item.clearable !== false"
+                :render-label="item.renderLabel"
+                :render-option="item.renderOption"
+                :render-tag="item.renderTag"
+                @update:value="(e) => changePropName(e, item)"
+              />
+              <!-- 树形选择框 -->
+              <n-tree-select
+                v-if="item?.type === 'treeSelect'"
+                v-model:value="formResult[item.propName]"
+                :options="getSelection(item)"
+                :disabled="item.disabled"
+                :readonly="item.readonly"
+                :label-field="item.selectionLabelKey"
+                :key-field="item.selectionValueKey"
+                :children-field="item.selectionChildrenKey"
+                :clearable="item.clearable !== false"
+                @update:value="(e) => changePropName(e, item)"
+              />
+              <!-- 单选框 -->
+              <n-radio-group
+                v-if="item?.type === 'radio'"
+                v-model:value="formResult[item.propName]"
+                @update:value="(e) => changePropName(e, item)"
+                :name="item.propName"
+                :disabled="item.disabled"
+                :readonly="item.readonly"
+              >
+                <n-space>
+                  <n-radio
+                    v-for="selectionItem in getSelection(item)"
+                    :key="selectionItem[item.selectionValueKey]"
+                    :value="selectionItem[item.selectionValueKey]"
+                  >
+                    {{ selectionItem[item.selectionLabelKey] }}
+                  </n-radio>
+                </n-space>
+              </n-radio-group>
+              <!-- 复选框 -->
+              <n-checkbox-group
+                v-if="item?.type === 'checkbox'"
+                v-model:value="formResult[item.propName]"
+              >
+                <n-space item-style="display: flex;">
+                  <n-checkbox
+                    v-for="selectionItem in getSelection(item)"
+                    :key="selectionItem[item.selectionValueKey]"
+                    :value="selectionItem[item.selectionValueKey]"
+                    :label="selectionItem[item.selectionLabelKey]"
+                  />
+                </n-space>
+              </n-checkbox-group>
+              <!-- 提示文字 -->
+              <span v-if="item?.type === 'text'" :style="item.style">
+                {{
+                  item.text?.xnsk_admin_ui_realType === "function"
+                    ? item.text()
+                    : item.text
+                }}
+              </span>
+              <!-- 图片上传 -->
+              <XnskUploadFileList
+                v-if="item?.type === 'image'"
+                v-model:value="formResult[item.propName]"
+                accept=".png,.jpg,.jpeg"
+                list-type="image-card"
+                :max="item.maxlength ?? 1"
+                :token="item.token"
+                :bucket="item.bucket"
+                :path="item.path"
+              >
+              </XnskUploadFileList>
+              <!-- 2023.11.9 优化 ,slot类型以后用slotName，和propName分开-->
+              <slot
+                v-if="item?.type === 'slot'"
+                :name="item.propName || item.slotName"
+                :data="formResult"
+                :item="item"
+              ></slot>
+            </n-form-item>
+          </n-gi>
+        </template>
       </n-grid>
     </n-form>
     <template v-if="!slot.btns">
