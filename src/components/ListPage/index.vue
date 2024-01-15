@@ -149,6 +149,7 @@
             v-for="(item, index) in props?.config?.table?.headBtns || []"
           >
             <n-button
+              v-permission="item?.permission"
               :type="item?.type || 'primary'"
               class="marL20"
               v-if="getHeadBtnShow(item)"
@@ -263,6 +264,8 @@ import {
   watchEffect,
   watch,
   onActivated,
+  withDirectives,
+  resolveDirective,
 } from "vue";
 import { SearchOutline, ReloadOutline } from "../../icon";
 const loading = ref(false);
@@ -445,49 +448,52 @@ function initTableColumns() {
             } */
               (_show || _show === undefined) &&
                 btns.push(
-                  h(
-                    NButton,
-                    {
-                      size: "small",
-                      /* loading: _loading, */
-                      quaternary: true,
-                      type: item?.type || "primary",
-                      disabled: _disabled,
-                      onClick: () => {
-                        if (item?.autoWarn) {
-                          dialog.warning({
-                            title: `确定${item.label}`,
-                            content: "",
-                            positiveText: "确定",
-                            negativeText: "取消",
-                            onPositiveClick: () => {
-                              item.click(row) || null;
-                            },
-                            onNegativeClick: () => {},
-                          });
-                        } else {
-                          item.click(row) || null;
-                        }
-                      },
-                      style: "--n-opacity-disabled: 0;",
-                    },
-                    {
-                      default: () => [
-                        _icon &&
-                          h(NIcon, {
-                            component: _icon,
-                          }),
-                        h(
-                          "div",
-                          {
-                            style: `margin-left:${_icon ? 5 : 0}px;`,
-                          },
-                          {
-                            default: () => item.label,
+                  withDirectives(
+                    h(
+                      NButton,
+                      {
+                        size: "small",
+                        /* loading: _loading, */
+                        quaternary: true,
+                        type: item?.type || "primary",
+                        disabled: _disabled,
+                        onClick: () => {
+                          if (item?.autoWarn) {
+                            dialog.warning({
+                              title: `确定${item.label}`,
+                              content: "",
+                              positiveText: "确定",
+                              negativeText: "取消",
+                              onPositiveClick: () => {
+                                item.click(row) || null;
+                              },
+                              onNegativeClick: () => {},
+                            });
+                          } else {
+                            item.click(row) || null;
                           }
-                        ),
-                      ],
-                    }
+                        },
+                        style: "--n-opacity-disabled: 0;",
+                      },
+                      {
+                        default: () => [
+                          _icon &&
+                            h(NIcon, {
+                              component: _icon,
+                            }),
+                          h(
+                            "div",
+                            {
+                              style: `margin-left:${_icon ? 5 : 0}px;`,
+                            },
+                            {
+                              default: () => item.label,
+                            }
+                          ),
+                        ],
+                      }
+                    ),
+                    [[resolveDirective("permission"), item?.permission]]
                   )
                 );
             });

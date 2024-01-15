@@ -23,7 +23,7 @@
           refId = el;
         }
       "
-      v-model:file-list="localFileList"
+      :default-file-list="localFileList"
       @remove="handleRemove"
       :multiple="multipleUpload"
       :default-upload="autoUpload"
@@ -44,7 +44,12 @@
 
 <script setup>
 import { onMounted, reactive, ref, useAttrs, watch, computed } from "vue";
-import { getFileNameByUrl, getSuffixName, getRandomKeys } from "../../utils";
+import {
+  getFileNameByUrl,
+  getSuffixName,
+  getRandomKeys,
+  createProgress,
+} from "../../utils";
 import http from "../../http";
 import { NUpload } from "naive-ui";
 const attrs = useAttrs();
@@ -152,7 +157,7 @@ watch(
 );
 
 /* 自定义上传 */
-const customRequest = async ({ file, onFinish, onError }) => {
+const customRequest = async ({ file, onFinish, onError, onProgress }) => {
   let formData = new FormData();
   formData.append("file", file.file);
   formData.append("bucket", props.bucket);
@@ -163,10 +168,17 @@ const customRequest = async ({ file, onFinish, onError }) => {
     formData.append(key, props.params[key]);
   });
   loading.value = true;
+  let p = createProgress();
+  p.start((percent) => {
+    onProgress({ percent });
+  });
   let res = await http(props.url, {
     token: props.token ?? localStorage.getItem("ACCESS-TOKEN"),
   })(formData);
   loading.value = false;
+  p.clear();
+  p = null;
+
   if (res?.status === 200) {
     const strId = getRandomKeys(10);
     file.url = res?.data?.url ?? "";

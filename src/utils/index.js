@@ -144,7 +144,7 @@ export function getFileContentByUrl(url) {
 /* 根据地址获取文件名 */
 export function getFileNameByUrl(_url = "") {
   return decodeURIComponent(_url).substring(
-    decodeURIComponent(_url).lastIndexOf("/") + 1,
+    decodeURIComponent(_url).lastIndexOf("/") + 1
   );
 }
 /**
@@ -202,11 +202,33 @@ export function diffProperty(obj1, obj2) {
   return result;
 }
 
-export function splitString (data = "", delimiter = ",") {
-  let str = data || ""
+export function splitString(data = "", delimiter = ",") {
+  let str = data || "";
   if (str.length > 0) {
-    return str.split(delimiter)
+    return str.split(delimiter);
   } else {
-    return []
+    return [];
   }
+}
+
+/**
+ * 模拟一个进度，最大到90%
+ */
+export function createProgress() {
+  let timer;
+  let start = (fn) => {
+    let p = 0;
+    timer = setInterval(() => {
+      if (p < 90) {
+        p += ((91 - p) / 90) * 4;
+        fn && fn(Math.round(p));
+      } else {
+        clearInterval(timer);
+      }
+    }, 100);
+  };
+  let clear = function () {
+    clearInterval(timer);
+  };
+  return { start, clear };
 }
