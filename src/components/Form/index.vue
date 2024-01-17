@@ -542,7 +542,7 @@ function cancelClick() {
 
 //监听change
 function changePropName(val, item) {
-  /* 单独处理校验规则 */
+  /* 单独处理校验规则 */ 
   if (item.clearByRegExp) {
     formResult.value[item.propName] = clearByRegExpHandler(
       formResult.value[item.propName],

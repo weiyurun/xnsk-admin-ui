@@ -53,8 +53,11 @@ import {
   useSlots,
   useAttrs,
   watchEffect,
+  onMounted,
+  onUnmounted,
 } from "vue";
 import { XnskBlueTitle } from "../index";
+import { onUrlChange, offUrlChange } from "../../utils/events";
 
 const emit = defineEmits(["update:show"]);
 const attrs = useAttrs();
@@ -145,6 +148,12 @@ function cancelClick() {
     callback[1] && callback[1]();
   }
 }
+
+function urlChanged() {
+  emit("update:show", false);
+}
+onMounted(() => onUrlChange(urlChanged));
+onUnmounted(() => offUrlChange(urlChanged));
 </script>
 
 <style lang="scss" scoped>

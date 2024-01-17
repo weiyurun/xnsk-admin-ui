@@ -15,8 +15,9 @@
 </template>
 
 <script setup>
-import { onMounted, useAttrs } from "vue";
+import { onMounted, useAttrs, onUnmounted } from "vue";
 import { NDrawer, NDrawerContent } from "naive-ui";
+import { onUrlChange, offUrlChange } from "../../utils/events";
 
 const attrs = useAttrs();
 const emits = defineEmits(["upload:show"]);
@@ -51,7 +52,11 @@ function maskClick() {
     });
   }
 }
-onMounted(() => {});
+function urlChanged() {
+  emits("update:show", false);
+}
+onMounted(() => onUrlChange(urlChanged));
+onUnmounted(() => offUrlChange(urlChanged));
 </script>
 
 <style lang="scss">
