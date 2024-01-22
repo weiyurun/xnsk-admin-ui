@@ -409,9 +409,10 @@ const getItems = computed(() => {
                   );
                 }
               }
-              //校验空
+              //校验空 2024.1.22 更新：考虑到选择类型的选项value可能就是"",所以判断选择类型不为null即可（先加一个select，其他用到了再加）
               if (
-                [null, undefined, ""].includes(value) ||
+                [null, undefined].includes(value) ||
+                (!["select"].includes(obj?.type) && value === "") ||
                 (value?.xnsk_admin_ui_realType === "array" &&
                   value?.length === 0)
               ) {
@@ -542,7 +543,7 @@ function cancelClick() {
 
 //监听change
 function changePropName(val, item) {
-  /* 单独处理校验规则 */ 
+  /* 单独处理校验规则 */
   if (item.clearByRegExp) {
     formResult.value[item.propName] = clearByRegExpHandler(
       formResult.value[item.propName],
