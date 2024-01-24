@@ -20,7 +20,7 @@
 
 其他属性：  
 `size`：字体大小。默认small对应14px，可选big对应18px。其他值直接写（如20px）  
-`showTitleBar`：是否现实蓝条，默认true
+`showTitleBar`：是否显示蓝条，默认true
 
 ---
 
