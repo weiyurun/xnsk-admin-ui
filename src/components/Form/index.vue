@@ -192,7 +192,11 @@ defaultValue [Object] 默认值
                 </n-space>
               </n-checkbox-group>
               <!-- 提示文字 -->
-              <span v-if="item?.type === 'text'" :style="item.style">
+              <span
+                :class="item.className"
+                v-if="item?.type === 'text'"
+                :style="item.style"
+              >
                 {{
                   item.text?.xnsk_admin_ui_realType === "function"
                     ? item.text()
@@ -341,6 +345,7 @@ const getItems = computed(() => {
       obj.placeholder = item.placeholder;
       obj.readonly = item?.readonly?.xnsk_admin_ui_realValue;
       obj.disabled = item?.disabled?.xnsk_admin_ui_realValue;
+      obj.className = item?.className ?? "";
 
       /* 2023.11.9 添加图片上传功能 */
       if (item?.type === "image") {

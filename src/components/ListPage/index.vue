@@ -182,7 +182,7 @@
               (props.config.selectionKey && row?.[props.config.selectionKey]) ??
               row.did ??
               row.id ??
-              row.randomId ??
+              row.xnsk_admin_ui_table_randomId ??
               ''
           "
           :pagination="
@@ -206,6 +206,7 @@
               : null
           "
           :default-expanded-row-keys="[getExpandedRow]"
+          v-model:expanded-row-keys="expandedIds"
           @load="onLoad"
           v-bind="attrs"
         />
@@ -279,12 +280,17 @@ const emit = defineEmits([
   "rowLoad",
   "rowExpand",
   "onUpdateChecked",
+  // "update:expandedIds"
 ]);
 const props = defineProps({
   config: {
     type: [Object, Function],
-    default: () => {},
+    default: () => ({}),
   },
+  // expandedIds: {
+  //   type: Array,
+  //   default: () => [],
+  // },
   loading: {
     type: Boolean,
     default: false,
@@ -549,7 +555,7 @@ function getTableData(newParams = {}, callback = null) {
   if (props?.config?.data?.xnsk_admin_ui_realValue?.length > 0) {
     if (props?.config?.isTree) {
       let data_ = props.config.data.xnsk_admin_ui_realValue.map((i) => {
-        return { ...i, randomId: getRandomId() };
+        return { ...i, xnsk_admin_ui_table_randomId: getRandomId() };
       });
       dataList.value = addRandomID(data_);
     } else {
@@ -571,13 +577,30 @@ function getTableData(newParams = {}, callback = null) {
       pageSize: pagination.value.pageSize,
     })
     .then((res) => {
-      callback && callback(res);
+      callback && callback(res); //如果想处理数据，请用dataProcessing；如果只是监听接口请求完成可以继续使用它
       if (res.status === 200) {
         let list_ = res?.list || res?.data?.list || [];
         if (props?.config?.isTree) {
-          dataList.value = list_.map((i) => {
-            return { ...i, getRandomId: getRandomId() };
+          /* 20241.26 如果是树形，又设置了clearExpanded为true（清空展开状态），则清空展开*/
+          if (props.config?.clearExpanded === true) {
+            expandedIds.value = [];
+          }
+
+          // 树形数据，无论后端是否有唯一标识did，默认添加一个唯一值
+          list_.forEach((i) => {
+            i.xnsk_admin_ui_table_randomId = getRandomId();
           });
+          // list_ = list_.map((i) => {
+          //   return { ...i, xnsk_admin_ui_table_randomId: getRandomId() };
+          // });
+          //2024.1.25 添加数据处理方法，某些情况，接口返回的数据需要处理格式或添加一些字段
+          if (
+            props?.config?.dataProcessing?.xnsk_admin_ui_realType === "function"
+          ) {
+            dataList.value = props.config.dataProcessing(list_);
+          } else {
+            dataList.value = list_;
+          }
         } else {
           dataList.value = list_;
         }
@@ -613,12 +636,17 @@ function getTableData(newParams = {}, callback = null) {
 function onLoad(row) {
   return new Promise((resolve, reject) => {
     let cb = (data = []) => {
-      row.children = data.map((i) => {
+      let key = props?.config?.childrenKey || "children";
+      row[key] = data.map((i) => {
         return { ...i };
       });
       resolve();
     };
-    if (props.config?.rowLoad?.xnsk_admin_ui_realType === "function") {
+    if (
+      ["function", "asyncfunction"].includes(
+        props.config?.rowLoad?.xnsk_admin_ui_realType
+      )
+    ) {
       props.config?.rowLoad(row, cb);
     } else {
       emit("rowLoad", row, cb);
@@ -626,21 +654,34 @@ function onLoad(row) {
   });
 }
 /* 树形，默认展开的行 */
+/* 2024.1.26停止维护该功能，目前没有遇到需要指定第几行需要展开的功能，要么全闭合，要么全展开 */
 const getExpandedRow = computed(() => {
   if (props?.config?.expandedIndex !== undefined) {
     return (
       dataList.value[props.config?.expandedIndex]?.did ??
       dataList.value[props.config?.expandedIndex]?.id ??
-      dataList.value[props.config?.expandedIndex]?.randomId ??
+      dataList.value[props.config?.expandedIndex]
+        ?.xnsk_admin_ui_table_randomId ??
       ""
     );
   } else {
-    return null;
+    return [];
   }
+});
+/* 2024.1.26 指定展开行的唯一标识 */
+const localExpandIds = ref([]);
+const expandedIds = computed({
+  get() {
+    return attrs.expandedIds ?? localExpandIds.value;
+  },
+  set(v) {
+    localExpandIds.value = v;
+    emit("update:expandedIds", v);
+  },
 });
 /* function getExpandedRow() {
   if (props?.config?.expandedIndex !== undefined) {
-    return dataList.value[props.config?.expandedIndex]?.getRandomId;
+    return dataList.value[props.config?.expandedIndex]?.xnsk_admin_ui_table_randomId;
   }
 } */
 
@@ -719,7 +760,7 @@ function handleCheckedRowKeys(keys, rows) {
       props?.config?.selectionKey ??
       rows[0]?.did ??
       rows[0]?.id ??
-      rows[0]?.randomId ??
+      rows[0]?.xnsk_admin_ui_table_randomId ??
       "did";
     rows.forEach((rowData) => {
       if (rowData) {

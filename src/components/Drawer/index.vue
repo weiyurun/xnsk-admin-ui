@@ -20,7 +20,7 @@ import { NDrawer, NDrawerContent } from "naive-ui";
 import { onUrlChange, offUrlChange } from "../../utils/events";
 
 const attrs = useAttrs();
-const emits = defineEmits(["upload:show"]);
+const emits = defineEmits(["update:show"]);
 const props = defineProps({
   title: {
     type: String,
