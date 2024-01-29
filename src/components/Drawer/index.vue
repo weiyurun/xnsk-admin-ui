@@ -6,6 +6,7 @@
     :trap-focus="false"
     :default-width="width"
     v-bind="attrs"
+    v-model:show="show"
     @mask-click="maskClick"
   >
     <n-drawer-content :title="title" closable>
@@ -15,7 +16,7 @@
 </template>
 
 <script setup>
-import { onMounted, useAttrs, onUnmounted } from "vue";
+import { onMounted, useAttrs, onUnmounted, computed } from "vue";
 import { NDrawer, NDrawerContent } from "naive-ui";
 import { onUrlChange, offUrlChange } from "../../utils/events";
 
@@ -33,6 +34,14 @@ const props = defineProps({
   outClosable: {
     type: Boolean,
     default: () => false,
+  },
+});
+const show = computed({
+  get() {
+    return attrs.show;
+  },
+  set(val) {
+    emits("update:show", val);
   },
 });
 function maskClick() {
