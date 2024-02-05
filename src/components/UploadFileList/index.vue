@@ -115,6 +115,11 @@ const props = defineProps({
     type: [Number, null],
     defualt: null,
   },
+  //是否改名：0:不改名，直接覆盖；1.改名；2.不改名，不覆盖
+  isUpdateFileName: {
+    type: Number,
+    default: 1, //为保证文件上传时，不会覆盖已上传的文件
+  },
 });
 /* 定义事件 */
 const emit = defineEmits([
@@ -162,6 +167,7 @@ const customRequest = async ({ file, onFinish, onError, onProgress }) => {
   formData.append("file", file.file);
   formData.append("bucket", props.bucket);
   formData.append("pathPrefix", props.path);
+  formData.append("isUpdateFileName", props.isUpdateFileName);
   //扩展参数
   let keys = Object.keys(props.params) || [];
   keys.forEach((key) => {
