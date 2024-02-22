@@ -195,7 +195,7 @@ defaultValue [Object] 默认值
               <span
                 :class="item.className"
                 v-if="item?.type === 'text'"
-                :style="item.style"
+                :style="item.subStyle"
               >
                 {{
                   item.text?.xnsk_admin_ui_realType === "function"
@@ -382,7 +382,7 @@ const getItems = computed(() => {
 
       obj.text = item.text || "";
       obj.style = item.style || "";
-
+      obj.subStyle = item.subStyle || "";
       /* 备选项 */
       //注释掉，不能在这里写，如果备选项是异步获取并且网速极慢，会在填写表单时重置表单，因为计算属性重新执行了
       /* if (item?.type === "select") {
