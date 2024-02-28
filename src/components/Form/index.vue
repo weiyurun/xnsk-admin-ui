@@ -432,7 +432,6 @@ const getItems = computed(() => {
           }
         },
       };
-      rules.value[obj.propName] = ruleObject;
 
       /* 是否显示 */
       let isShow =
@@ -441,6 +440,7 @@ const getItems = computed(() => {
           ? item.show(formResult.value)
           : item.show);
       isShow && arr.push(obj);
+      isShow && (rules.value[obj.propName] = ruleObject);
     });
     return arr;
   }
