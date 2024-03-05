@@ -76,10 +76,17 @@
       <slot name="top" :dataList="dataList" :loading="loading"></slot>
       <!-- 搜索部分 -->
       <div
-        class="list-page-search marB20"
+        class="list-page-search flex marB20"
         v-if="searchItems.length > 0 && !config.params.hidden"
       >
-        <n-grid x-gap="12" cols="24" responsive="screen">
+        <n-grid
+          class="flex-1"
+          x-gap="12"
+          y-gap="12"
+          cols="24 s:6 m:10 l:12 xl:24"
+          responsive="screen"
+          style="padding-right: 12px"
+        >
           <template v-for="(item, index) in searchItems">
             <n-gi v-if="!item.hidden" :key="index" :span="item.span || 6">
               <!-- 输入框 -->
@@ -108,7 +115,7 @@
             </n-gi>
           </template>
 
-          <n-gi :suffix="true" span="6">
+          <!-- <n-gi suffix>
             <div class="flex-1 justify-end flex">
               <n-button type="primary" @click="searchClick">
                 <template #icon>
@@ -126,8 +133,26 @@
                 >重置</n-button
               >
             </div>
-          </n-gi>
+          </n-gi> -->
         </n-grid>
+        <div style="min-width: max-content">
+          <n-button type="primary" @click="searchClick">
+            <template #icon>
+              <n-icon>
+                <SearchOutline />
+              </n-icon>
+            </template>
+            查询
+          </n-button>
+          <n-button class="ml-3" @click="searchReset">
+            <template #icon>
+              <n-icon>
+                <ReloadOutline />
+              </n-icon>
+            </template>
+            重置
+          </n-button>
+        </div>
       </div>
       <!-- 中间插槽 -->
       <slot name="center" :dataList="dataList" :loading="loading"></slot>
@@ -149,7 +174,6 @@
             v-for="(item, index) in props?.config?.table?.headBtns || []"
           >
             <n-button
-              v-permission="item?.permission"
               :type="item?.type || 'primary'"
               class="marL20"
               v-if="getHeadBtnShow(item)"
@@ -203,7 +227,7 @@
           :children-key="
             props?.config?.isTree
               ? props?.config?.childrenKey || 'children'
-              : null
+              : null 
           "
           :default-expanded-row-keys="[getExpandedRow]"
           v-model:expanded-row-keys="expandedIds"
@@ -265,7 +289,6 @@ import {
   watchEffect,
   watch,
   onActivated,
-  withDirectives,
   resolveDirective,
 } from "vue";
 import { SearchOutline, ReloadOutline } from "../../icon";
@@ -363,7 +386,18 @@ function initParams() {
 function initTableColumns() {
   let _columns = props?.config?.table?.columns || [];
   tableColumns.value = _columns
-    .filter((i) => i)
+    .filter((item) => {
+      // 兼容以前的配置，如果传空，不解析此列
+      if (!item) {
+        return false;
+      }
+      // 2024.3.1 添加show字段，决定是否显示列
+      if (item?.show?.xnsk_admin_ui_realValue === false) {
+        return false;
+      }
+      // 默认显示
+      return true;
+    })
     .map((item, index) => {
       let obj = {
         ellipsis: !item.unEllipsis
@@ -454,52 +488,49 @@ function initTableColumns() {
             } */
               (_show || _show === undefined) &&
                 btns.push(
-                  withDirectives(
-                    h(
-                      NButton,
-                      {
-                        size: "small",
-                        /* loading: _loading, */
-                        quaternary: true,
-                        type: item?.type || "primary",
-                        disabled: _disabled,
-                        onClick: () => {
-                          if (item?.autoWarn) {
-                            dialog.warning({
-                              title: `确定${item.label}`,
-                              content: "",
-                              positiveText: "确定",
-                              negativeText: "取消",
-                              onPositiveClick: () => {
-                                item.click(row) || null;
-                              },
-                              onNegativeClick: () => {},
-                            });
-                          } else {
-                            item.click(row) || null;
-                          }
-                        },
-                        style: "--n-opacity-disabled: 0;",
-                      },
-                      {
-                        default: () => [
-                          _icon &&
-                            h(NIcon, {
-                              component: _icon,
-                            }),
-                          h(
-                            "div",
-                            {
-                              style: `margin-left:${_icon ? 5 : 0}px;`,
+                  h(
+                    NButton,
+                    {
+                      size: "small",
+                      /* loading: _loading, */
+                      quaternary: true,
+                      type: item?.type || "primary",
+                      disabled: _disabled,
+                      onClick: () => {
+                        if (item?.autoWarn) {
+                          dialog.warning({
+                            title: `确定${item.label}`,
+                            content: "",
+                            positiveText: "确定",
+                            negativeText: "取消",
+                            onPositiveClick: () => {
+                              item.click(row) || null;
                             },
-                            {
-                              default: () => item.label,
-                            }
-                          ),
-                        ],
-                      }
-                    ),
-                    [[resolveDirective("permission"), item?.permission]]
+                            onNegativeClick: () => {},
+                          });
+                        } else {
+                          item.click(row) || null;
+                        }
+                      },
+                      style: "--n-opacity-disabled: 0;",
+                    },
+                    {
+                      default: () => [
+                        _icon &&
+                          h(NIcon, {
+                            component: _icon,
+                          }),
+                        h(
+                          "div",
+                          {
+                            style: `margin-left:${_icon ? 5 : 0}px;`,
+                          },
+                          {
+                            default: () => item.label,
+                          }
+                        ),
+                      ],
+                    }
                   )
                 );
             });
