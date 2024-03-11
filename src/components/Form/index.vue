@@ -1,40 +1,3 @@
-<!--
-  form表单组件
-
- <xnsk-form :config="formConfig" :defaultValue="defaultValue" />
-
-defaultValue [Object] 默认值 
-
- config说明
-
-  labelWidth [Number]  文案宽度（px)
-  trigger [String] 校验触发方式
-  submitBtn [Ojbect] 提交按钮
-    {
-      label [String] 按钮文案
-      loading [Proxy(Boolean)] 按钮loading ，响应式Boolean
-      click [Function] 表单校验成功后的回调
-    }
-  columns [Array] 表单项
-    {
-      label [String] 文案
-      type [String] 类型（input,textarea,select,radio,checkBox）
-      propName [String] 属性名
-      required [Boolean] 是否必填
-      maxlength [Number] 最大长度
-      //defaultValue 默认值 
-      show [Function | Boolean] 是否显示
-      disabled [Function | Boolean] 是否禁用
-      readonly [Function | Boolean] 是否只读
-      rows [Number] textarea默认行数
-      selection [Array] select,radio,checkBox的备选项
-      validator 自定义校验规则
-    }
-
-  slot:
-    btns  自定义底部按钮
-
--->
 <template>
   <div>
     <n-form
@@ -69,10 +32,7 @@ defaultValue [Object] 默认值
               "
               :path="item.propName"
             >
-              <n-spin
-                :show="item.loading"
-                style="display: inline-block; width: 100%"
-              >
+              <n-spin :show="item.loading" class="inline-block w-full">
                 <!-- 单行输入框 -->
                 <n-input
                   v-trim
@@ -346,6 +306,7 @@ const getItems = computed(() => {
       obj.span = item.span || 24;
       obj.offset = item.offset || 0;
       obj.onInput = item.onInput || null;
+      obj.onChange = item.change || item.onChange || null; // 2024年3月6日
       obj.onBlur = item.onBlur || null;
       obj.clearable = item.clearable;
       obj.placeholder = item.placeholder;
@@ -572,9 +533,17 @@ function changePropName(val, item) {
       formResult.value[item.propName] = res;
     }
   }
+  // 上面是老写法，不删了，后面直接用下面新写法 2024年3月6日
+  if (item?.onChange?.xnsk_admin_ui_realType === "function") {
+    let res = item?.onChange?.(val, item);
+    if (res !== undefined) {
+      formResult.value[item.propName] = res;
+    }
+  }
   //通知更新，返回最终结果
-  if (props.config?.change) {
-    props.config?.change(unref(formResult.value), item, val);
+  const fn = props.config?.onChange || props.config?.change || null;
+  if (fn && fn.xnsk_admin_ui_realType === "function") {
+    fn(unref(formResult.value), item, val);
   } else {
     emit("change", unref(formResult.value), item, val);
   }

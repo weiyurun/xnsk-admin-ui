@@ -85,14 +85,14 @@
           y-gap="12"
           cols="24 s:6 m:10 l:12 xl:24"
           responsive="screen"
-          style="padding-right: 12px"
+          style="padding-right: 100px"
         >
           <template v-for="(item, index) in searchItems">
             <n-gi v-if="!item.hidden" :key="index" :span="item.span || 6">
               <!-- 输入框 -->
               <n-input
                 v-if="item?.type === 'input'"
-                v-model:value="params[item.propName]"
+                v-model:value="params[item.propName ?? item.key]"
                 :placeholder="item.placeholder || '请输入' + item.label"
                 clearable
                 :disabled="item.disabled === true || false"
@@ -227,7 +227,7 @@
           :children-key="
             props?.config?.isTree
               ? props?.config?.childrenKey || 'children'
-              : null 
+              : null
           "
           :default-expanded-row-keys="[getExpandedRow]"
           v-model:expanded-row-keys="expandedIds"
@@ -321,9 +321,9 @@ const props = defineProps({
 });
 /* 搜索项 */
 const searchItems = computed(() => {
-  return props?.config?.params?.columns?.length > 0
-    ? props?.config?.params?.columns
-    : [];
+  // 2024年3月11日 优化：搜索项以后用items
+  let res = props?.config?.params?.items || props?.config?.params?.columns;
+  return res?.length > 0 ? res : [];
 });
 /* 标题 */
 const getTitle = computed(() => {
