@@ -158,15 +158,24 @@
       <slot name="center" :dataList="dataList" :loading="loading"></slot>
       <!-- 标题 + 按钮  -->
       <div
-        v-if="props?.config?.table?.title || props?.config?.table?.headBtns"
+        v-if="
+          props?.config?.table?.title ||
+          props?.config?.table?.headBtns ||
+          props?.config?.table?.titleSlot
+        "
         class="overflow-hidden flex items-center justify-between"
         style="margin-bottom: 20px"
       >
         <XnskBlueTitle
           size="16px"
-          v-if="props?.config?.table?.title"
+          v-if="props?.config?.table?.title && !props.config?.table?.titleSlot"
           :title="getTitle"
         />
+
+        <slot
+          v-else-if="props?.config?.table?.titleSlot"
+          :name="props.config.table.titleSlot"
+        ></slot>
         <!-- 无标题时占位，保证按钮在右侧 -->
         <span v-else></span>
         <p style="display: flex">
@@ -418,8 +427,8 @@ function initTableColumns() {
           return item.customValue(row);
         };
       } else if (item.slot) {
-        obj.render = (row) => {
-          return h(slots[item.slot], row);
+        obj.render = (row, rowIndex) => {
+          return h(slots[item.slot], { ...row, rowIndex });
         };
       } else {
         obj.render = (row) => {
@@ -443,7 +452,7 @@ function initTableColumns() {
       /* 操作栏统一固定右侧 */
       if (item.key === "actions") {
         obj.fixed = "right";
-        obj.render = (row) => {
+        obj.render = (row, rowIndex) => {
           let btns = [];
           if (props?.config?.table?.actions?.length > 0) {
             props.config.table.actions.forEach((item) => {
@@ -504,12 +513,12 @@ function initTableColumns() {
                             positiveText: "确定",
                             negativeText: "取消",
                             onPositiveClick: () => {
-                              item.click(row) || null;
+                              item.click(row, rowIndex) || null;
                             },
                             onNegativeClick: () => {},
                           });
                         } else {
-                          item.click(row) || null;
+                          item.click(row, rowIndex) || null;
                         }
                       },
                       style: "--n-opacity-disabled: 0;",

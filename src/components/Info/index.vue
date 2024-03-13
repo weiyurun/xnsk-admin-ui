@@ -30,7 +30,7 @@
           block: item.flex === false,
           'inline-flex': item.flex !== false,
         }"
-        v-for="(item, index) in config?.column || []"
+        v-for="(item, index) in config?.items || config?.column || []"
         :key="item?.did || index"
         :span="item.span ?? 8"
       >
@@ -46,7 +46,7 @@
             'text-align': config.labelAlign ?? 'left',
           }"
         >
-          {{ item.label }}{{ config?.useColon ? ":" : "" }} 
+          {{ item.label }}{{ config?.useColon ? ":" : "" }}
         </span>
         <!-- 值 -->
         <template v-if="item.slot">
