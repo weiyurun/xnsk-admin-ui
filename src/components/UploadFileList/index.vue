@@ -120,6 +120,11 @@ const props = defineProps({
     type: Number,
     default: 1, //为保证文件上传时，不会覆盖已上传的文件
   },
+  // 大小限制，单位kb（默认10M）
+  maxSize: {
+    type: Number,
+    default: () => 1024 * 1024 * 10,
+  },
 });
 /* 定义事件 */
 const emit = defineEmits([
@@ -209,7 +214,7 @@ async function beforeUpload(file) {
     return false;
   }
   //判断大小
-  if (file.file.size / 1024 > props.maxSize) {
+  if (file.file.size > props.maxSize) {
     $message.error("文件大小超出限制");
     return false;
   }

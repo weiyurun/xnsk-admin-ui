@@ -1,11 +1,10 @@
 
 # 先农数科，平台项目专用 UI 框架
 
-  
 
 基于 naiveUI
 
-  
+本文档不再更新，后期以[ 在线文档 ](https://www.zybuluo.com/weiyurun/note/2546489)形式查看最新文档
 
 ##### XnskBlueTitle 左侧带蓝条标题
 
