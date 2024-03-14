@@ -1,70 +1,4 @@
-<!--
-    列表页组件
-    <XnskListPage :config="config" />
-    参数说明：
-    config：
-      expand [Function]: 行展开事件，不写就是不可展开
-      isTree [Boolean]: 是否树形
-      apiName [Function]: 接口方法
-      data [Array]: 本地数据，如果使用本地数据，将忽略apiName
-      params [Object]: 搜索参数
-        columns [Array]: 搜索项
-          说明：
-            label [String]: 文案
-            type [String]: 类型，目前支持input、select，持续开发中
-            propName [String]: 参数名
-            defaultValue [] : 默认值
-            width [Number]:  自定义宽度（开发中……）
-        change [Function]: 搜索项发生变化时回调
-            返回params: 1. 完整搜索结果 2. 发生变化的那一项
-        hidden 是否显示 页面不需要筛选项但接口需要默认参数时使用
-      table [Object]: 表格内容
-        title [String]: 标题
-        headBtns [Array]: 头部按钮
-          说明：
-            label [String] 按钮名
-            click: [Function] 按钮回调
-            icon: [Component] 按钮图标
-            loading: [Proxy(Boolean) | Function] 是否显示loading
-              案例：
-                const _loading = ref(false)
-              支持的写法：
-                1. loading : _loading
-                2. loading : () => _loading
-                3. loading : () => _loading.value
-              不支持将原始值直接赋值，原因都懂的~
-        actions [Array]: 右侧操作按钮
-          说明：
-              label: [String] 按钮名
-              click: [Function] 按钮回调
-              icon: [Component] 按钮图标
-              show: [Function | Boolean] 是否显示
-              disabled: [Function | Boolean] 是否禁用
-        columns [Array] 表格列
-          说明：
-            title [String] 标题
-            key [String] 参数名
-            width [Number] 列宽
-            slot [String] 自定义显示内容，以slot形式
-            unEllipsis:不适用溢出省略号（默认溢出显示省略号，鼠标滑过显示内容）
-            customValue [Function] 自定义显示内容
-              例如：customValue: (row) => moment(row.updateTime).format("yyyy-MM-DD hh:mm:ss")
-          注意：操作栏key统一为actions 
-    组件slot
-      top 搜索栏上面部分
-      center 搜索栏和表格中间部分
-      footer 底部
-
-    事件：
-      search 搜索或重置时触发，已使用场景：列表页的统计需要单独获取
-    实例方法：
-      getTableData 主动更新列表数据，用于右侧操作区更改数据后的刷新
-    实例属性：
-      pageData 页面数据
-      loading table上的loading，右侧操作区异步操作时可以设为true防止频繁点击
-      params 当前筛选项值，用本页面的筛选项查其他接口时使用
-
--->
+<!-- 列表页面 -->
 <template>
   <div
     class="list-page"
@@ -109,6 +43,8 @@
                 :placeholder="item.placeholder || '请选择' + item.label"
                 clearable
                 :disabled="item.disabled === true || false"
+                :value-field="item.valueKey || 'value'"
+                :label-field="item.labelKey || 'label'"
                 @update:value="paramsChange(item)"
               >
               </n-select>
@@ -409,11 +345,13 @@ function initTableColumns() {
     })
     .map((item, index) => {
       let obj = {
-        ellipsis: !item.unEllipsis
-          ? {
-              tooltip: true,
-            }
-          : false,
+        ellipsis:
+          // 用ellipsis可能更直观，默认true，显示...，如需关闭，必须设置为false
+          !item.unEllipsis && item?.ellipsis !== false
+            ? {
+                tooltip: true,
+              }
+            : false,
         align:
           props?.config?.isTree && index === 0
             ? "left"
@@ -557,7 +495,7 @@ function initTableColumns() {
       }
       return { ...item, ...obj };
     });
-  /* 行是否可展开 */
+  /* 如果需要展开且自定义内容，可配置该函数 */
   if (props?.config?.expand) {
     tableColumns.value.unshift({
       type: "expand",
@@ -608,14 +546,14 @@ function getTableData(newParams = {}, callback = null) {
     //当配置项里data为[]时，表格数据为[]。因为需要和组件内部获取数据区分开，所以加了判断，当外部传入数据或清空数据时，实时变化
     dataList.value = [];
   }
-  if (!props.config.apiName) return;
+  if (!props.config.apiName && !props.config.api) return; // 2024年3月14日15:03:12 更名为props.config.api
+  let apiFunction = props.config.apiName ?? props.config.api;
   loading.value = true;
-  props.config
-    .apiName({
-      ...params.value,
-      pageNum: pagination.value.page,
-      pageSize: pagination.value.pageSize,
-    })
+  apiFunction({
+    ...params.value,
+    pageNum: pagination.value.page,
+    pageSize: pagination.value.pageSize,
+  })
     .then((res) => {
       callback && callback(res); //如果想处理数据，请用dataProcessing；如果只是监听接口请求完成可以继续使用它
       if (res.status === 200) {
@@ -633,11 +571,12 @@ function getTableData(newParams = {}, callback = null) {
           // list_ = list_.map((i) => {
           //   return { ...i, xnsk_admin_ui_table_randomId: getRandomId() };
           // });
-          //2024.1.25 添加数据处理方法，某些情况，接口返回的数据需要处理格式或添加一些字段
-          if (
-            props?.config?.dataProcessing?.xnsk_admin_ui_realType === "function"
-          ) {
-            dataList.value = props.config.dataProcessing(list_);
+          // 2024.1.25 添加数据处理方法，某些情况，接口返回的数据需要处理格式或添加一些字段
+          // 2024年3月14日 更名为dataProcess
+          let dataProcess =
+            props?.config?.dataProcessing ?? props?.config?.dataProcess;
+          if (dataProcess?.xnsk_admin_ui_realType === "function") {
+            dataList.value = dataProcess(list_);
           } else {
             dataList.value = list_;
           }
