@@ -527,6 +527,13 @@ function getSelection(_arr = []) {
 
 /* 获取页面数据 */
 function getTableData(newParams = {}, callback = null) {
+  // 2024年3月18日 输入框trim一下
+  Object.keys(params.value).forEach((key) => {
+    if (typeof params.value[key] === "string") {
+      params.value[key] = params.value[key].trim();
+    }
+  });
+
   /* newParams合并到当前搜索条件中 */
   params.value = { ...params.value, ...newParams };
 
