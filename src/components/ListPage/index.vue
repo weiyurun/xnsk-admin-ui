@@ -38,7 +38,7 @@
               <!-- 下拉框 -->
               <n-select
                 v-if="item?.type === 'select'"
-                v-model:value="params[item.propName]"
+                v-model:value="params[item.propName ?? item.key]"
                 :options="getSelection(item.selection)"
                 :placeholder="item.placeholder || '请选择' + item.label"
                 clearable
@@ -118,22 +118,44 @@
           <template
             v-for="(item, index) in props?.config?.table?.headBtns || []"
           >
-            <n-button
-              :type="item?.type || 'primary'"
-              class="marL20"
-              v-if="getHeadBtnShow(item)"
-              :key="index"
-              :loading="getButtonLoading(item.loading)"
-              :disabled="getHeadBtnDisabled(item)"
-              @click="item.click"
-            >
-              <n-icon
-                v-if="item.icon"
-                :component="item.icon"
-                style="margin-right: 8px"
-              />
-              <span> {{ item.label }}</span>
-            </n-button>
+            <!-- 2024年3月19日 判断是否注册了权限指令 -->
+            <template v-if="resolveDirective('permission')">
+              <n-button
+                v-permission="item?.permission"
+                :type="item?.type || 'primary'"
+                class="marL20"
+                v-if="getHeadBtnShow(item)"
+                :key="index"
+                :loading="getButtonLoading(item.loading)"
+                :disabled="getHeadBtnDisabled(item)"
+                @click="item.click"
+              >
+                <n-icon
+                  v-if="item.icon"
+                  :component="item.icon"
+                  style="margin-right: 8px"
+                />
+                <span> {{ item.label }}</span>
+              </n-button>
+            </template>
+            <template v-else>
+              <n-button
+                :type="item?.type || 'primary'"
+                class="marL20"
+                v-if="getHeadBtnShow(item)"
+                :key="index"
+                :loading="getButtonLoading(item.loading)"
+                :disabled="getHeadBtnDisabled(item)"
+                @click="item.click"
+              >
+                <n-icon
+                  v-if="item.icon"
+                  :component="item.icon"
+                  style="margin-right: 8px"
+                />
+                <span> {{ item.label }}</span>
+              </n-button>
+            </template>
           </template>
         </p>
       </div>
@@ -234,6 +256,7 @@ import {
   watchEffect,
   watch,
   onActivated,
+  withDirectives,
   resolveDirective,
 } from "vue";
 import { SearchOutline, ReloadOutline } from "../../icon";
@@ -435,49 +458,54 @@ function initTableColumns() {
             } */
               (_show || _show === undefined) &&
                 btns.push(
-                  h(
-                    NButton,
-                    {
-                      size: "small",
-                      /* loading: _loading, */
-                      quaternary: true,
-                      type: item?.type || "primary",
-                      disabled: _disabled,
-                      onClick: () => {
-                        if (item?.autoWarn) {
-                          dialog.warning({
-                            title: `确定${item.label}`,
-                            content: "",
-                            positiveText: "确定",
-                            negativeText: "取消",
-                            onPositiveClick: () => {
-                              item.click(row, rowIndex) || null;
-                            },
-                            onNegativeClick: () => {},
-                          });
-                        } else {
-                          item.click(row, rowIndex) || null;
-                        }
-                      },
-                      style: "--n-opacity-disabled: 0;",
-                    },
-                    {
-                      default: () => [
-                        _icon &&
-                          h(NIcon, {
-                            component: _icon,
-                          }),
-                        h(
-                          "div",
-                          {
-                            style: `margin-left:${_icon ? 5 : 0}px;`,
-                          },
-                          {
-                            default: () => item.label,
+                  withDirectives(
+                    h(
+                      NButton,
+                      {
+                        size: "small",
+                        /* loading: _loading, */
+                        quaternary: true,
+                        type: item?.type || "primary",
+                        disabled: _disabled,
+                        onClick: () => {
+                          if (item?.autoWarn) {
+                            dialog.warning({
+                              title: `确定${item.label}`,
+                              content: "",
+                              positiveText: "确定",
+                              negativeText: "取消",
+                              onPositiveClick: () => {
+                                item.click(row, rowIndex) || null;
+                              },
+                              onNegativeClick: () => {},
+                            });
+                          } else {
+                            item.click(row, rowIndex) || null;
                           }
-                        ),
-                      ],
-                    }
+                        },
+                        style: "--n-opacity-disabled: 0;",
+                      },
+                      {
+                        default: () => [
+                          _icon &&
+                            h(NIcon, {
+                              component: _icon,
+                            }),
+                          h(
+                            "div",
+                            {
+                              style: `margin-left:${_icon ? 5 : 0}px;`,
+                            },
+                            {
+                              default: () => item.label,
+                            }
+                          ),
+                        ],
+                      }
+                    ),
+                    resolveDirective("permission")
+                      ? [[resolveDirective("permission"), item?.permission]]
+                      : []
                   )
                 );
             });
@@ -680,7 +708,9 @@ function searchClick() {
 /* 重置查询条件 */
 async function searchReset() {
   for (let p in params.value) {
-    let findItem = searchItems.value.find((i) => i.propName === p);
+    let findItem = searchItems.value.find(
+      (i) => i.propName === p || i.key === p
+    );
     if (findItem) {
       if (
         !findItem?.readOnly?.xnsk_admin_ui_realValue &&
