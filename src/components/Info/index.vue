@@ -30,7 +30,7 @@
           block: item.flex === false,
           'inline-flex': item.flex !== false,
         }"
-        v-for="(item, index) in config?.items || config?.column || []"
+        v-for="(item, index) in getItems"
         :key="item?.did || index"
         :span="item.span ?? 8"
       >
@@ -61,9 +61,10 @@
 </template>
 
 <script setup>
-import { useAttrs } from "vue";
+import { useAttrs, computed } from "vue";
 import { XnskBlueTitle } from "../index";
 import { NGrid, NGi } from "naive-ui";
+import { clearEmptyData } from "../../utils/index";
 const attrs = useAttrs();
 const props = defineProps({
   config: {
@@ -74,6 +75,9 @@ const props = defineProps({
     type: Object,
     defualt: () => {},
   },
+});
+const getItems = computed(() => {
+  return clearEmptyData(props?.config?.items) || props?.config?.column || [];
 });
 /* 处理值 */
 function getItemValue(_value) {

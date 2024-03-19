@@ -339,10 +339,10 @@ function initParams() {
   if (searchItems.value.length) {
     searchItems.value.forEach((item) => {
       if (item?.type === "input" || !item.type) {
-        params.value[item.propName] =
+        params.value[item.propName ?? item.key] =
           item?.defaultValue?.xnsk_admin_ui_realValue ?? "";
       } else if (item?.type === "select") {
-        params.value[item.propName] =
+        params.value[item.propName ?? item.key] =
           item.defaultValue === "" || item.defaultValue === undefined
             ? null
             : item.defaultValue?.xnsk_admin_ui_realValue;

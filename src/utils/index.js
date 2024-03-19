@@ -232,3 +232,13 @@ export function createProgress() {
   };
   return { start, clear };
 }
+
+export function clearEmptyData(arr = []) {
+  return arr?.filter((i) => {
+    if (i === null || i === false || i === undefined || i === "") {
+      return false;
+    } else {
+      return true;
+    }
+  });
+}
