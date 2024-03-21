@@ -83,9 +83,9 @@ const getItems = computed(() => {
 function getItemValue(_value) {
   if (typeof _value === "string") {
     if (props.data) {
-      return props?.data[_value] || "-";
+      return props?.data[_value] || "—";
     } else {
-      return props.config?.data[_value] || "-";
+      return props.config?.data[_value] || "—";
     }
   } else if (Object.prototype.toString.call(_value) === "[object Function]") {
     return _value();
