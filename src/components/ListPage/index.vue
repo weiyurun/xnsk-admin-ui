@@ -271,7 +271,7 @@ const emit = defineEmits([
   "rowLoad",
   "rowExpand",
   "onUpdateChecked",
-  // "update:expandedIds"
+  "update:expandedIds",
 ]);
 const props = defineProps({
   config: {
@@ -598,23 +598,16 @@ function getTableData(newParams = {}, callback = null) {
           if (props.config?.clearExpanded === true) {
             expandedIds.value = [];
           }
-
           // 树形数据，无论后端是否有唯一标识did，默认添加一个唯一值
           list_.forEach((i) => {
             i.xnsk_admin_ui_table_randomId = getRandomId();
           });
-          // list_ = list_.map((i) => {
-          //   return { ...i, xnsk_admin_ui_table_randomId: getRandomId() };
-          // });
-          // 2024.1.25 添加数据处理方法，某些情况，接口返回的数据需要处理格式或添加一些字段
-          // 2024年3月14日 更名为dataProcess
-          let dataProcess =
-            props?.config?.dataProcessing ?? props?.config?.dataProcess;
-          if (dataProcess?.xnsk_admin_ui_realType === "function") {
-            dataList.value = dataProcess(list_);
-          } else {
-            dataList.value = list_;
-          }
+        }
+        // 2024年3月20日 把处理数据的函数挪外面来， 非tree数据也可能会用到
+        let dataProcess =
+          props?.config?.dataProcessing ?? props?.config?.dataProcess;
+        if (dataProcess?.xnsk_admin_ui_realType === "function") {
+          dataList.value = dataProcess(list_);
         } else {
           dataList.value = list_;
         }
@@ -668,7 +661,6 @@ function onLoad(row) {
   });
 }
 /* 树形，默认展开的行 */
-/* 2024.1.26停止维护该功能，目前没有遇到需要指定第几行需要展开的功能，要么全闭合，要么全展开 */
 const getExpandedRow = computed(() => {
   if (props?.config?.expandedIndex !== undefined) {
     return (
@@ -851,10 +843,15 @@ watch(
     immediate: true,
   }
 );
+/* 主动清空数据 */
+function clearData() {
+  dataList.value = [];
+}
 defineExpose({
   getTableData,
   refresh: getTableData,
   getSelectValues,
+  clearData,
   pageData,
   loading,
   params,

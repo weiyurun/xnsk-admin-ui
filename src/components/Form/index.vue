@@ -648,16 +648,20 @@ function submitClick() {
 /* 弹窗确认 */
 function confirm() {
   if (props.config?.submitBtn?.click) {
-    $dialog.warning({
-      title: "确定提交？",
-      content: "",
-      positiveText: "确定",
-      negativeText: "取消",
-      onPositiveClick: () => {
-        props.config?.submitBtn?.click(unref(formResult.value));
-      },
-      onNegativeClick: () => {},
-    });
+    if (props.config?.submitBtn?.autoWarn === false) {
+      props.config?.submitBtn?.click(unref(formResult.value));
+    } else {
+      $dialog.warning({
+        title: "确定提交？",
+        content: "",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: () => {
+          props.config?.submitBtn?.click(unref(formResult.value));
+        },
+        onNegativeClick: () => {},
+      });
+    }
   } else {
     $dialog.warning({
       title: "确定提交？",
