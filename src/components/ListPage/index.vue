@@ -30,7 +30,7 @@
                 :placeholder="item.placeholder || '请输入' + item.label"
                 clearable
                 :disabled="
-                  item.disabled.xnsk_admin_ui_realValue === true || false
+                  item?.disabled?.xnsk_admin_ui_realValue === true || false
                 "
                 :maxlength="item.maxlength || 200"
                 @update:value="paramsChange(item)"
@@ -45,7 +45,7 @@
                 :placeholder="item.placeholder || '请选择' + item.label"
                 clearable
                 :disabled="
-                  item.disabled.xnsk_admin_ui_realValue === true || false
+                  item?.disabled?.xnsk_admin_ui_realValue === true || false
                 "
                 :value-field="item.valueKey || 'value'"
                 :label-field="item.labelKey || 'label'"
