@@ -226,7 +226,7 @@
           v-if="tableColumns.find((i) => i.type === 'selection')"
           style="position: absolute; left: 2px"
         >
-          已选 {{ checkedKeys.length }}
+          已选 {{ checkedKeys?.length || 0 }}
         </span>
         <span> 总计 {{ pagination.itemCount }} </span>
       </template>
@@ -841,6 +841,17 @@ watch(
   () => props?.config?.table?.columns,
   () => {
     initTableColumns();
+  },
+  {
+    deep: true,
+    immediate: true,
+  }
+);
+/* 2024年3月26日 已选数量回显功能BUG：原功能在勾选时更新已选数量，在回显时未触发*/
+watch(
+  () => attrs["default-checked-row-keys"],
+  () => {
+    checkedKeys.value = attrs["default-checked-row-keys"] || [];
   },
   {
     deep: true,

@@ -3,7 +3,7 @@
     fileString:
     {{ fileString }}
     <XnskUploadFileList
-      token="bbaa76d65c9a4d7098b721384691acd8"
+      token="55bf295bce144cec995d4ffd47bce63c"
       bucket="xnsk-ruian-common"
       path="module/file/aggregationEntrance"
       v-model:value="fileString"
