@@ -22,7 +22,11 @@
           style="padding-right: 100px"
         >
           <template v-for="(item, index) in searchItems">
-            <n-gi v-if="!item.hidden" :key="index" :span="item.span || 6">
+            <n-gi
+              v-if="!item?.hidden?.xnsk_admin_ui_realValue"
+              :key="index"
+              :span="item.span || 6"
+            >
               <!-- 输入框 -->
               <n-input
                 v-if="item?.type === 'input'"
@@ -41,7 +45,7 @@
               <n-select
                 v-if="item?.type === 'select'"
                 v-model:value="params[item.propName ?? item.key]"
-                :options="getSelection(item.selection)"
+                :options="getSelection(item.selection, item)"
                 :placeholder="item.placeholder || '请选择' + item.label"
                 clearable
                 :disabled="
@@ -270,6 +274,7 @@ const attrs = useAttrs();
 const dialog = useDialog();
 const emit = defineEmits([
   "search",
+  "searchReset",
   "success",
   "finally",
   "rowLoad",
@@ -541,10 +546,11 @@ function initTableColumns() {
   }, 0);
 }
 /* 获取下拉项 */
-function getSelection(_arr = []) {
+function getSelection(_arr = [], item) {
+  let result = [];
   let _type = Object.prototype.toString.call(_arr);
   if (_type === "[object Array]") {
-    return _arr;
+    result = _arr;
   } else if (_type === "[object Object]") {
     let _keys = Object.keys(_arr);
     let res = _keys.map((key) => {
@@ -553,8 +559,17 @@ function getSelection(_arr = []) {
         value: key,
       };
     });
-    return res;
+    result = res;
   }
+  // 2024年3月27日 如果更新了下拉项，判断已选值是否在下拉项中
+  let _value = params.value[item.propName ?? item.key];
+  if (_value != null) {
+    if (!result.find((i) => i[item?.valueKey || "value"] === _value)) {
+      // 如果找不到，清空已选
+      params.value[item.propName ?? item.key] = null;
+    }
+  }
+  return result;
 }
 
 /* 获取页面数据 */
@@ -709,6 +724,7 @@ async function searchReset() {
     );
     if (findItem) {
       if (
+        !findItem?.readonly?.xnsk_admin_ui_realValue &&
         !findItem?.readOnly?.xnsk_admin_ui_realValue &&
         !findItem?.hidden?.xnsk_admin_ui_realValue
       ) {
@@ -719,6 +735,7 @@ async function searchReset() {
   }
   searchClick();
   emit("search");
+  emit("searchReset");
 }
 
 /* 表格头部按钮是否显示 */

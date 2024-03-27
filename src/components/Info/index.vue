@@ -25,7 +25,7 @@
     />
     <n-grid :class="{ 'has-border': config?.border }">
       <n-gi
-        class="info-page-item items-start padT10 padB10"
+        class="info-page-item items-start pt-[10px]"
         :class="{
           block: item.flex === false,
           'inline-flex': item.flex !== false,
@@ -39,8 +39,8 @@
           <slot :name="item.labelSlot"></slot>
         </template>
         <span
-          class="info-page-label inline-block padR10"
-          else
+          class="info-page-label inline-block pr-[10px] pb-[10px]"
+          v-else-if="item?.label?.xnsk_admin_ui_realValue?.length > 0"
           :style="{
             minWidth: config.labelWidth ? config.labelWidth + 'px' : 'auto',
             'text-align': config.labelAlign ?? 'left',
@@ -77,7 +77,7 @@ const props = defineProps({
   },
 });
 const getItems = computed(() => {
-  return clearEmptyData(props?.config?.items) || props?.config?.column || [];
+  return clearEmptyData(props?.config?.items || props?.config?.column || []);
 });
 /* 处理值 */
 function getItemValue(_value) {
