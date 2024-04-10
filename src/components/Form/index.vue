@@ -12,7 +12,12 @@
       :label-width="config.labelWidth || 'auto'"
       require-mark-placement="right"
     >
-      <n-grid x-gap="12" :cols="24" item-responsive responsive="screen">
+      <n-grid
+        x-gap="12"
+        :cols="24"
+        item-responsive
+        :responsive="config.responsive ?? 'screen'"
+      >
         <template v-for="item in getItems" :key="item.propName">
           <n-gi
             v-if="item.type"
