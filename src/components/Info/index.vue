@@ -77,7 +77,16 @@ const props = defineProps({
   },
 });
 const getItems = computed(() => {
-  return clearEmptyData(props?.config?.items || props?.config?.column || []);
+  return clearEmptyData(
+    props?.config?.items || props?.config?.column || []
+  ).filter((i) => {
+    // 过滤数据：不设置show默认显示；如果show为函数，执行它，获取结果
+    return (
+      i.show === undefined ||
+      (i.show.xnsk_admin_ui_realType === "function" &&
+        i.show(props.data ?? props.config?.data))
+    );
+  });
 });
 /* 处理值 */
 function getItemValue(_value) {
@@ -88,7 +97,7 @@ function getItemValue(_value) {
       return props.config?.data[_value] || "—";
     }
   } else if (Object.prototype.toString.call(_value) === "[object Function]") {
-    return _value();
+    return _value(props.data ?? props.config?.data);
   } else {
     return "";
   }

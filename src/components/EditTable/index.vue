@@ -121,7 +121,7 @@ function getOptions(item) {
       // 允许使用异步，但异步的结果需要是数组（不要将后端返回的数组直接丢进来）
       item.selection
         .then((res) => {
-          if (res?.axnsk_admin_ui_realType === "array") {
+          if (res?.xnsk_admin_ui_realType === "array") {
             return res.map((i) => {
               return {
                 label: i[labelKey],

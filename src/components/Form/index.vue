@@ -289,8 +289,8 @@ const submitLoading = computed(() => {
 /* 表单项 */
 const getItems = computed(() => {
   let arr = [];
-  if (props.config?.columns?.length > 0) {
-    props.config.columns.forEach((item) => {
+  if ((props.config?.columns || props.config?.items)?.length > 0) {
+    (props.config?.columns || props.config?.items)?.forEach((item) => {
       let obj = {};
       obj.label = item.label;
       obj.type = item?.type;
@@ -452,12 +452,14 @@ function initValue(newVal, from = "defaultValue") {
   let diff = diffProperty(newVal || {}, formResult.value);
   let keys = Object.keys(diff);
   keys.forEach((key) => {
-    let findItem = props.config?.columns.find((item) => item.propName === key);
+    let findItem = (props.config?.columns || props.config?.items)?.find(
+      (item) => item.propName === key
+    );
     findItem && (formResult.value[key] = getDefaultValue(findItem, from));
   });
 }
 function initForm() {
-  let items = props.config?.columns || [];
+  let items = props.config?.columns || props.config?.items || [];
   items.forEach((item) => {
     switch (item?.type) {
       case "input":

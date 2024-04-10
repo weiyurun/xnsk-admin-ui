@@ -17,7 +17,7 @@
           class="flex-1"
           x-gap="12"
           y-gap="12"
-          cols="24 s:6 m:10 l:12 xl:24"
+          cols="24 s:6 m:12 l:18 xl:24"
           responsive="screen"
           style="padding-right: 100px"
         >
@@ -580,7 +580,16 @@ function getTableData(newParams = {}, callback = null) {
       params.value[key] = params.value[key].trim();
     }
   });
-
+  // 2024年3月27日 搜索时，遍历搜索项配置
+  searchItems?.value?.forEach((i) => {
+    // 该项是否需要清空（hidden为true，且useValue为false）
+    if (
+      i?.hidden?.xnsk_admin_ui_realValue === true &&
+      i?.useValue?.xnsk_admin_ui_realValue === false
+    ) {
+      params.value[i?.propName || i?.key] = i?.type === "select" ? null : "";
+    }
+  });
   /* newParams合并到当前搜索条件中 */
   params.value = { ...params.value, ...newParams };
 
