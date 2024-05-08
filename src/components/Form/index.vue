@@ -616,7 +616,7 @@ function checkByRegExpName(val, name) {
   switch (name) {
     case "code":
       return codeReg.test(val);
-    case "code":
+    case "number":
       return numberReg.test(val);
   }
 }
@@ -648,7 +648,7 @@ function submitClick() {
       confirm();
     } else {
       /* 不通过 */
-      message.error("请检查必填项");
+      message.error("请检查填写内容");
     }
   });
 }

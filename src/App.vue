@@ -3,9 +3,9 @@
     fileString:
     {{ fileString }}
     <XnskUploadFileList
-      token="55bf295bce144cec995d4ffd47bce63c"
+      token="9f9f2e198b7c467ca11d5cd86a261a19"
       bucket="xnsk-ruian-common"
-      path="module/file/aggregationEntrance"
+      path="fe/resource/js/common-files/tracking/v2"
       v-model:value="fileString"
       isUpdateFileName="0"
       :max="1"
@@ -16,7 +16,10 @@
     </XnskUploadFileList>
   </div>
 </template>
-
+<!-- 
+module/file/aggregationEntrance
+fe/resource/js/common-files/tracking/v2/
+ -->
 <script setup>
 import { computed, ref } from "vue";
 import { XnskUploadFileList } from "./components";
