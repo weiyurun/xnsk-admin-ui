@@ -1,4 +1,5 @@
 import useMiniHttp from "@xnsk/mini-http";
+import axios from "axios";
 const config = {
   baseURL: "",
   beforeRequest: (request, extendsConfig) => {
@@ -40,4 +41,21 @@ const config = {
   },
 };
 const http = useMiniHttp(config);
+
+/* 添加一个get请求，仅返回成功的内容，失败直接抛出异常，外层用catch接收，catch返回内容为从网络层开始的异常信息 */
+export const get = async function (url) {
+  return new Promise((resolve, reject) => {
+    axios.get(url).then((res) => {
+      if (res?.status === 200) {
+        if (res?.data.status === 200) {
+          resolve(res.data?.data ?? {});
+        } else {
+          reject(res);
+        }
+      } else {
+        reject(res);
+      }
+    });
+  });
+};
 export default http;

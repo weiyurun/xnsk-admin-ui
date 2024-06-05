@@ -14,6 +14,7 @@ export { XnskUploadFileList, XnskUpload } from "./UploadFileList";
 export { XnskEditTable } from "./EditTable";
 export { XnskErrorIcon } from "./ErrorIcon";
 export { XnskRightMenu } from "./RightMenu";
+export { XnskAreaSelect } from "./AreaSelect";
 
 /* 业务组件 */
 export { XnskModuleList } from "./moduleList";

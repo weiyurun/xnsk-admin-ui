@@ -8,7 +8,7 @@
     :mask-closable="!lock"
     class="dialog-templete"
     :style="{
-      width: width + 'px',
+      width: getWidth,
       height: height + 'px',
     }"
   >
@@ -107,7 +107,15 @@ const props = defineProps({
     defualt: false,
   },
 });
-
+/* 2024年6月4日 优化宽度 */
+const getWidth = computed(() => {
+  let _s = String(props.width);
+  if (/^\d+$/.test(_s)) {
+    return _s + "px";
+  } else {
+    return _s;
+  }
+});
 //按钮数组
 const _btns = computed(() => {
   if (props.btns === undefined && props.footBtns === undefined) {

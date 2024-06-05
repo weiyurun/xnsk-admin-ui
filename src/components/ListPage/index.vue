@@ -951,7 +951,7 @@ defineExpose({
     justify-content: flex-end;
     position: sticky;
     bottom: 0;
-    z-index: 1;
+    z-index: 9;
     background-color: #fff;
   }
 }
