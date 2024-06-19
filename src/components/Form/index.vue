@@ -174,7 +174,7 @@
                 </span>
                 <!-- 图片上传 -->
                 <XnskUploadFileList
-                  v-if="item?.type === 'image'"
+                  v-if="['image', 'images'].includes(item?.type)"
                   v-model:value="formResult[item.propName]"
                   accept=".png,.jpg,.jpeg"
                   list-type="image-card"
@@ -182,9 +182,25 @@
                   :token="item.token"
                   :bucket="item.bucket"
                   :path="item.path"
+                  @update:value="(e) => changePropName(e, item)"
                 >
                 </XnskUploadFileList>
-                <!-- 2023.11.9 优化 ,slot类型以后用slotName，和propName分开-->
+                <!-- 文件上传 -->
+                <XnskUploadFileList
+                  v-if="['file', 'files'].includes(item?.type)"
+                  v-model:value="formResult[item.propName]"
+                  :accept="item.accept ?? null"
+                  :max="item.maxlength ?? 999"
+                  :token="item.token"
+                  :bucket="item.bucket"
+                  :path="item.path"
+                  @update:value="(e) => changePropName(e, item)"
+                >
+                  <template #uploadBtn>
+                    <n-button type="primary"> 上传 </n-button>
+                  </template>
+                </XnskUploadFileList>
+                <!-- 2023.11.9 优化 ,slot类型以后用slotName，和propName分开 -->
                 <slot
                   v-if="item?.type === 'slot'"
                   :name="item.propName || item.slotName"
@@ -317,6 +333,7 @@ const getItems = computed(() => {
       obj.placeholder = item.placeholder;
       obj.readonly = item?.readonly?.xnsk_admin_ui_realValue;
       obj.disabled = item?.disabled?.xnsk_admin_ui_realValue;
+      obj.errorMessage = item?.errorMessage?.xnsk_admin_ui_realValue;
       obj.className = item?.className ?? "";
       // 2024.3.5 单项Loading
       obj.loading = item?.loading?.xnsk_admin_ui_realValue ?? false;
@@ -395,7 +412,11 @@ const getItems = computed(() => {
                 (value?.xnsk_admin_ui_realType === "array" &&
                   value?.length === 0)
               ) {
-                return new Error(`${errMsgPrefix[obj?.type]}${obj.label}`);
+                if (obj.errorMessage) {
+                  return new Error(obj.errorMessage);
+                } else {
+                  return new Error(`${errMsgPrefix[obj?.type]}${obj.label}`);
+                }
               }
               //都通过，返回true
               return true;
@@ -638,7 +659,10 @@ function getInputStyle(item) {
 
 /* 点击提交 */
 function submitClick() {
-  let fn = props.config?.submitBtn?.customValidate;
+  let fn =
+    props.config?.submitBtn?.customValidate ||
+    props.config?.submitBtn?.validator ||
+    null;
   if (fn?.xnsk_admin_ui_realType === "function") {
     fn(unref(formResult.value), confirm);
     return;

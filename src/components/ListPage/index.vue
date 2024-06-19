@@ -794,12 +794,7 @@ function handleCheckedRowKeys(keys, rows) {
   */
   let keyWord = "";
   if (rows?.length > 0) {
-    keyWord =
-      props?.config?.selectionKey ??
-      rows[0]?.did ??
-      rows[0]?.id ??
-      rows[0]?.xnsk_admin_ui_table_randomId ??
-      "did";
+    keyWord = props?.config?.selectionKey ?? "did";
     rows.forEach((rowData) => {
       if (rowData) {
         //查询历史数据是否已存在

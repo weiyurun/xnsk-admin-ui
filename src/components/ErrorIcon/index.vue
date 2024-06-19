@@ -4,7 +4,7 @@
     @click="errDialogShow = true"
     style="font-size: 0"
     ><span class="inline-block"
-      ><n-icon size="20" color="#d03050">
+      ><n-icon size="20">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink"

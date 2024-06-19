@@ -12,7 +12,7 @@ export { XnskLoginAgreement } from "./LoginAgreement";
 export { XnskTreeSync } from "./TreeSync";
 export { XnskUploadFileList, XnskUpload } from "./UploadFileList";
 export { XnskEditTable } from "./EditTable";
-export { XnskErrorIcon } from "./ErrorIcon";
+export { XnskErrorIcon, XnskLogIcon } from "./ErrorIcon";
 export { XnskRightMenu } from "./RightMenu";
 export { XnskAreaSelect } from "./AreaSelect";
 
