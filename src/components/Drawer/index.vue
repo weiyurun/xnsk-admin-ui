@@ -19,7 +19,8 @@
 import { onMounted, useAttrs, onUnmounted, computed } from "vue";
 import { NDrawer, NDrawerContent } from "naive-ui";
 import { onUrlChange, offUrlChange } from "../../utils/events";
-
+import { useDialog } from "naive-ui";
+const dialog = useDialog();
 const attrs = useAttrs();
 const emits = defineEmits(["update:show"]);
 const props = defineProps({
@@ -48,7 +49,7 @@ function maskClick() {
   if (props.outClosable) {
     emits("update:show", false);
   } else {
-    $dialog.warning({
+    dialog.warning({
       title: "确定关闭",
       content: "",
       positiveText: "确定",

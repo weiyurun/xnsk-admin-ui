@@ -24,6 +24,7 @@
     <XnskDialogMsg
       v-model:show="errDialogShow"
       :data="props.message"
+      @success="props.autoClose && (errDialogShow = false)"
     ></XnskDialogMsg>
   </span>
 </template>
@@ -39,6 +40,10 @@ const props = defineProps({
   fontSize: {
     type: String,
     default: "14px",
+  },
+  autoClose: {
+    type: Boolean,
+    default: true,
   },
 });
 

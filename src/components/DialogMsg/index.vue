@@ -31,9 +31,10 @@
 import { XnskDialog } from "../index";
 import { computed, useSlots } from "vue";
 import { writeToClipBoard } from "../../utils";
-import { NButton } from "naive-ui";
+import { NButton, useMessage } from "naive-ui";
 const emit = defineEmits(["update:show"]);
 
+const $message = window.$message || useMessage();
 const slot = useSlots();
 const props = defineProps({
   show: {

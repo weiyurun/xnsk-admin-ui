@@ -1,0 +1,76 @@
+{
+  "hash": "74ed6889",
+  "configHash": "2c30c8f8",
+  "lockfileHash": "cf9126ec",
+  "browserHash": "3bc1bc60",
+  "optimized": {
+    "@vue/devtools-api": {
+      "src": "../../../../node_modules/@vue/devtools-api/lib/esm/index.js",
+      "file": "@vue_devtools-api.js",
+      "fileHash": "bf2d6958",
+      "needsInterop": false
+    },
+    "@vuepress/shared": {
+      "src": "../../../../node_modules/@vuepress/shared/dist/index.js",
+      "file": "@vuepress_shared.js",
+      "fileHash": "ecc6b433",
+      "needsInterop": false
+    },
+    "vue": {
+      "src": "../../../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "file": "vue.js",
+      "fileHash": "f137ca08",
+      "needsInterop": false
+    },
+    "vue-router": {
+      "src": "../../../../node_modules/vue-router/dist/vue-router.esm-bundler.js",
+      "file": "vue-router.js",
+      "fileHash": "89e72771",
+      "needsInterop": false
+    },
+    "naive-ui": {
+      "src": "../../../../node_modules/naive-ui/es/index.mjs",
+      "file": "naive-ui.js",
+      "fileHash": "d231b5c6",
+      "needsInterop": false
+    },
+    "markdown-it": {
+      "src": "../../../../node_modules/markdown-it/index.js",
+      "file": "markdown-it.js",
+      "fileHash": "acd03ab0",
+      "needsInterop": true
+    },
+    "houriprotocol": {
+      "src": "../../../../node_modules/houriprotocol/dist/index_es.js",
+      "file": "houriprotocol.js",
+      "fileHash": "6d8f9db9",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "2c6ed4ec",
+      "needsInterop": true
+    },
+    "@xnsk/mini-http": {
+      "src": "../../../../node_modules/@xnsk/mini-http/lib/index_es.js",
+      "file": "@xnsk_mini-http.js",
+      "fileHash": "6dbcfb95",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-UKCZNIRO": {
+      "file": "chunk-UKCZNIRO.js"
+    },
+    "chunk-ICRYXTSQ": {
+      "file": "chunk-ICRYXTSQ.js"
+    },
+    "chunk-N56FRCBQ": {
+      "file": "chunk-N56FRCBQ.js"
+    },
+    "chunk-CEQRFMJQ": {
+      "file": "chunk-CEQRFMJQ.js"
+    }
+  }
+}

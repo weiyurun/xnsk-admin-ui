@@ -244,6 +244,7 @@ import {
   NTreeSelect,
   NSpace,
   NSpin,
+  useDialog,
 } from "naive-ui";
 import {
   computed,
@@ -264,7 +265,8 @@ import {
   numberReg,
 } from "../../utils/regExp";
 
-const message = useMessage();
+const $message = window.$message || useMessage();
+const $dialog = window.$dialog || useDialog();
 
 const errMsgPrefix = {
   "input-select": "请输入",
@@ -672,7 +674,7 @@ function submitClick() {
       confirm();
     } else {
       /* 不通过 */
-      message.error("请检查填写内容");
+      $message.error("请检查填写内容");
     }
   });
 }

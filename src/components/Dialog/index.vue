@@ -24,7 +24,7 @@
       <div v-else class="dialog-templete-btns">
         <n-button
           v-if="_btns.length > 0"
-          type="info"
+          type="primary"
           :loading="loading"
           @click="submitClick"
         >
@@ -32,7 +32,7 @@
         </n-button>
         <n-button
           v-if="_btns.length > 1"
-          type="info"
+          type="default"
           ghost
           @click="cancelClick"
         >
