@@ -393,6 +393,12 @@ const getItems = computed(() => {
         validator(rule, value) {
           if (obj?.validator?.xnsk_admin_ui_realType === "function") {
             //如果传函数校验，直接取函数返回结果
+            let valRes = obj?.validator(value);
+            if (valRes.xnsk_admin_ui_realType === "error") {
+              return valRes;
+            } else {
+              return Error(valRes);
+            }
             return obj?.validator(value);
           } else if (obj?.validator?.xnsk_admin_ui_realType === undefined) {
             //如果不传校验规则

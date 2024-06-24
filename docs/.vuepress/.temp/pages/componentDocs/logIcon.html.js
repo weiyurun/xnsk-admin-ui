@@ -1,5 +1,5 @@
 import comp from "D:/codes/xnsk_admin_ui/docs/.vuepress/.temp/pages/componentDocs/logIcon.html.vue"
-const data = JSON.parse("{\"path\":\"/componentDocs/logIcon.html\",\"title\":\"\",\"lang\":\"zh-CN\",\"frontmatter\":{},\"headers\":[],\"git\":{\"updatedTime\":null,\"contributors\":[]},\"filePathRelative\":\"componentDocs/logIcon.md\"}")
+const data = JSON.parse("{\"path\":\"/componentDocs/logIcon.html\",\"title\":\"\",\"lang\":\"zh-CN\",\"frontmatter\":{},\"headers\":[],\"git\":{\"updatedTime\":1718871663000,\"contributors\":[{\"name\":\"weiyurun\",\"email\":\"weiyurun\",\"commits\":1}]},\"filePathRelative\":\"componentDocs/logIcon.md\"}")
 export { comp, data }
 
 if (import.meta.webpackHot) {
