@@ -394,10 +394,13 @@ const getItems = computed(() => {
           if (obj?.validator?.xnsk_admin_ui_realType === "function") {
             //如果传函数校验，直接取函数返回结果
             let valRes = obj?.validator(value);
-            if (valRes.xnsk_admin_ui_realType === "error") {
+            if (valRes?.xnsk_admin_ui_realType === "error") {
               return valRes;
-            } else {
+            } else if (valRes !== undefined) {
               return Error(valRes);
+            } else {
+              // 如果代码中只判断了异常，忘记成功时返回true，默认为true
+              return true;
             }
             return obj?.validator(value);
           } else if (obj?.validator?.xnsk_admin_ui_realType === undefined) {
